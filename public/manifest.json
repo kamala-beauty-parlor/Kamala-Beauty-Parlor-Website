@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "Kamala Beauty Parlor",
+  "short_name": "Kamala",
+  "description": "Premier beauty salon in Swayambhu, Kathmandu. Hair styling, bridal artistry, facials, nails, mehendi & beautician masterclasses.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#8A2E44",
+  "icons": [
+    {
+      "src": "/assets/aistudio/Kamala_Beauty_Parlor_Gold_Emblem_f4a21eee.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/aistudio/Kamala_Beauty_Parlor_Gold_Emblem_f4a21eee.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/aistudio/Kamala_Beauty_Parlor_Gold_Emblem_f4a21eee.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

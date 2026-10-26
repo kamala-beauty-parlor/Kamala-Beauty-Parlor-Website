@@ -7,9 +7,11 @@ import {
   Calendar, 
   MessageCircle, 
   ArrowRight,
-  Filter
+  Filter,
+  Check
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
+import { useLanguage } from '../context/LanguageContext';
 import { DynamicSections } from '../components/DynamicSections';
 
 interface ServicesProps {
@@ -19,19 +21,20 @@ interface ServicesProps {
 
 export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServiceToBook }) => {
   const { services, categories: siteCategories, settings } = useSite();
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const categories = React.useMemo(() => {
     const fromSite = siteCategories.filter(c => c.visible !== false).map(c => c.name);
-    return ['All', ...fromSite.length > 0 ? fromSite : [
+    return ['All', ...(fromSite.length > 0 ? fromSite : [
       'Hair',
       'Facial & Skin',
       'Makeup',
       'Nails',
       'Threading & Waxing',
       'Mehendi'
-    ]];
+    ])];
   }, [siteCategories]);
 
   const filteredServices = services
@@ -58,23 +61,23 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10 bg-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-14 space-y-8 bg-white pb-28 sm:pb-16 overflow-x-hidden">
       {/* Header Banner - Pink & White */}
-      <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-1.5 bg-pink-50 text-pink-700 border border-pink-200 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase">
+      <div className="text-center max-w-3xl mx-auto space-y-3">
+        <div className="inline-flex items-center gap-1.5 bg-pink-50 text-pink-700 border border-pink-200 px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase">
           <Sparkles className="w-3.5 h-3.5 text-pink-500" />
-          Transparent Pricing • Nepali Rupees (NPR)
+          <span>Transparent Kathmandu Prices • NPR</span>
         </div>
-        <h1 className="font-serif text-3xl sm:text-5xl font-bold text-pink-950">
-          Services & Price Menu
+        <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-pink-950">
+          {t('nav.services', 'Services & Price Menu')}
         </h1>
-        <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
+        <p className="text-stone-600 text-xs sm:text-base leading-relaxed">
           From rejuvenating facials, hair coloring, and relaxing spas to party glam and bridal transformations. All beauty services use genuine, skin-friendly cosmetics.
         </p>
       </div>
 
-      {/* Search & Category Filter Toolbar */}
-      <div className="space-y-4 bg-white p-4 sm:p-6 rounded-2xl border border-pink-200 shadow-xs">
+      {/* Sticky Search & Category Filter Toolbar */}
+      <div className="sticky top-[58px] sm:top-[66px] z-20 space-y-3 bg-white/95 backdrop-blur-md p-3 sm:p-5 rounded-2xl border border-pink-200 shadow-sm">
         {/* Search Input */}
         <div className="relative max-w-md mx-auto sm:mx-0">
           <Search className="w-4 h-4 text-pink-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -83,34 +86,35 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
             placeholder="Search haircut, facial, bridal, keratin..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-pink-200 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white"
+            className="w-full pl-10 pr-12 py-2.5 text-base sm:text-xs rounded-xl border border-pink-200 focus:outline-none focus:border-pink-500 bg-white"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-pink-500 hover:text-pink-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-pink-600 font-bold hover:text-pink-800 p-1"
             >
               Clear
             </button>
           )}
         </div>
 
-        {/* Categories Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <Filter className="w-4 h-4 text-pink-400 flex-shrink-0" />
+        {/* Categories Chips (Horizontal swipe with tap feedback) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+          <Filter className="w-3.5 h-3.5 text-pink-400 flex-shrink-0 hidden sm:block" />
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                className={`min-h-[40px] px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1 active:scale-95 cursor-pointer ${
                   isSelected
                     ? 'bg-pink-600 text-white shadow-xs'
-                    : 'bg-pink-50 text-stone-700 hover:bg-pink-100/80 border border-pink-100'
+                    : 'bg-pink-50 text-stone-700 hover:bg-pink-100/80 border border-pink-200'
                 }`}
               >
-                {cat}
+                {isSelected && <Check className="w-3 h-3 text-white" />}
+                <span>{cat}</span>
               </button>
             );
           })}
@@ -122,7 +126,7 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
         <div className="text-center py-16 bg-pink-50/40 rounded-2xl border border-dashed border-pink-300">
           <Scissors className="w-10 h-10 text-pink-300 mx-auto mb-3" />
           <h3 className="font-serif text-lg font-bold text-stone-700">No services found</h3>
-          <p className="text-sm text-stone-500 mt-1">
+          <p className="text-xs sm:text-sm text-stone-500 mt-1">
             Try adjusting your search query or select another category.
           </p>
           <button
@@ -130,17 +134,17 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
               setSelectedCategory('All');
               setSearchQuery('');
             }}
-            className="mt-4 text-xs font-bold text-pink-600 hover:underline"
+            className="mt-4 min-h-[44px] px-4 py-2 text-xs font-bold text-pink-600 hover:underline cursor-pointer"
           >
             Reset Filters
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredServices.map((service) => (
             <div
               key={service.id || service.title}
-              className="bg-white rounded-2xl p-6 border border-pink-100 shadow-xs hover:shadow-md transition-all hover:border-pink-300 flex flex-col justify-between"
+              className="bg-white rounded-2xl p-4 sm:p-6 border border-pink-100 shadow-xs hover:shadow-md transition-all hover:border-pink-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2">
@@ -148,34 +152,34 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
                     {service.category}
                   </span>
                   <div className="text-right">
-                    <span className="font-serif text-2xl font-bold text-pink-600">
+                    <span className="font-serif text-xl sm:text-2xl font-bold text-pink-600">
                       Rs. {service.price.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
-                <h3 className="font-serif text-xl font-bold text-stone-900 mt-2">
+                <h3 className="font-serif text-lg sm:text-xl font-bold text-stone-900 mt-1.5">
                   {service.title}
                 </h3>
 
-                <p className="text-stone-600 text-xs sm:text-sm mt-2 leading-relaxed">
+                <p className="text-stone-600 text-xs sm:text-sm mt-1.5 leading-relaxed">
                   {service.description ||
                     'Pampering salon treatment executed with professional precision and genuine cosmetics.'}
                 </p>
 
                 {service.duration && (
-                  <div className="flex items-center gap-1.5 text-xs text-stone-400 mt-3 font-medium">
+                  <div className="flex items-center gap-1.5 text-xs text-stone-400 mt-2.5 font-medium">
                     <Clock className="w-3.5 h-3.5 text-pink-400" />
                     <span>Estimated time: {service.duration}</span>
                   </div>
                 )}
               </div>
 
-              {/* Action Buttons in Pink & White */}
-              <div className="pt-5 mt-4 border-t border-pink-50 flex items-center gap-2">
+              {/* Action Buttons with 44px+ touch target */}
+              <div className="pt-4 mt-3 border-t border-pink-50 flex items-center gap-2">
                 <button
                   onClick={() => handleBookService(service.title)}
-                  className="flex-1 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs active:scale-95"
+                  className="flex-1 min-h-[44px] bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
                 >
                   <Calendar className="w-3.5 h-3.5 text-white" />
                   <span>Book Now</span>
@@ -187,11 +191,11 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#25D366] hover:bg-[#20be5a] text-white py-2.5 px-3 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1 shadow-xs active:scale-95"
+                  className="min-h-[44px] bg-[#25D366] hover:bg-[#20be5a] text-white py-2.5 px-3.5 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1 shadow-xs active:scale-95"
                   title="Direct booking on WhatsApp (No sign-in required)"
                 >
                   <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                  <span className="hidden sm:inline">WhatsApp</span>
+                  <span>WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -199,13 +203,13 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
         </div>
       )}
 
-      {/* Custom Packages / Wedding Bridal Notice in Pink & White */}
-      <div className="bg-gradient-to-r from-pink-50 via-pink-100/40 to-white rounded-3xl p-6 sm:p-8 border border-pink-200 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
-        <div className="space-y-2 text-center md:text-left">
-          <h3 className="font-serif text-2xl font-bold text-pink-950">
+      {/* Custom Packages / Wedding Bridal Notice */}
+      <div className="bg-gradient-to-r from-pink-50 via-pink-100/40 to-white rounded-3xl p-5 sm:p-8 border border-pink-200 flex flex-col md:flex-row items-center justify-between gap-5 shadow-xs">
+        <div className="space-y-1.5 text-center md:text-left">
+          <h3 className="font-serif text-xl sm:text-2xl font-bold text-pink-950">
             Need a Customized Bridal or Festival Package?
           </h3>
-          <p className="text-stone-600 text-sm max-w-xl">
+          <p className="text-stone-600 text-xs sm:text-sm max-w-xl">
             We provide bridal makeover packages including HD Airbrush makeup, luxury hair updos, saree draping, and pre-wedding skin therapies at discounted combo rates.
           </p>
         </div>
@@ -216,7 +220,7 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-full text-sm font-bold shadow-xs transition flex items-center gap-2 whitespace-nowrap"
+          className="min-h-[46px] bg-pink-600 hover:bg-pink-700 text-white px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-xs transition flex items-center justify-center gap-2 whitespace-nowrap active:scale-95"
         >
           <span>Inquire Bridal Combos</span>
           <ArrowRight className="w-4 h-4 text-pink-200" />

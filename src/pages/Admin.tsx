@@ -521,190 +521,349 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 <p className="text-stone-400 text-xs">Try clearing search or status filters to view records.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-[#FAF7F2] text-stone-700 uppercase font-bold border-b border-stone-200">
-                    <tr>
-                      <th className="py-3 px-4">Customer</th>
-                      <th className="py-3 px-4">Contact</th>
-                      <th className="py-3 px-4">Date & Slot</th>
-                      <th className="py-3 px-4">Services</th>
-                      <th className="py-3 px-4">Price (NPR)</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-100">
-                    {filteredBookings.map((b) => {
-                      const name = b.customerName || b.userName || 'Customer';
-                      const phone = b.customerPhone || b.phone || '';
-                      const email = b.customerEmail || b.email || '';
-                      const time = b.timeSlot || b.time || '';
-                      const srvNames = getBookingServiceNames(b);
+              <div>
+                {/* Mobile Cards View (Visible on small screens, no horizontal scroll) */}
+                <div className="block md:hidden divide-y divide-pink-100">
+                  {filteredBookings.map((b) => {
+                    const name = b.customerName || b.userName || 'Customer';
+                    const phone = b.customerPhone || b.phone || '';
+                    const email = b.customerEmail || b.email || '';
+                    const time = b.timeSlot || b.time || '';
+                    const srvNames = getBookingServiceNames(b);
 
-                      const cleanPhone = phone.replace(/[^0-9]/g, '');
-                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                        `Namaste ${name}! This is Kamala Beauty Parlor regarding your appointment for ${b.date} at ${time}. Services: ${srvNames.join(', ')}. Status: ${b.status.toUpperCase()}.`
-                      )}` : '';
+                    const cleanPhone = phone.replace(/[^0-9]/g, '');
+                    const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+                      `Namaste ${name}! This is Kamala Beauty Parlor regarding your appointment for ${b.date} at ${time}. Services: ${srvNames.join(', ')}. Status: ${b.status.toUpperCase()}.`
+                    )}` : '';
 
-                      return (
-                        <tr key={b.id} className="hover:bg-pink-50/30 transition-colors">
-                          <td className="py-3 px-4">
-                            <div className="font-bold text-stone-900">{name}</div>
-                            {b.notes && (
-                              <div className="text-[10px] text-stone-500 italic max-w-xs truncate">
-                                Note: {b.notes}
-                              </div>
-                            )}
-                            {b.adminNote && (
-                              <div className="text-[10px] text-[#8A2E44] font-semibold max-w-xs truncate">
-                                Admin: {b.adminNote}
-                              </div>
-                            )}
-                          </td>
-
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-1.5">
-                              {phone ? (
-                                <a href={`tel:${phone}`} className="font-semibold text-stone-800 hover:text-[#8A2E44]">
-                                  {phone}
-                                </a>
-                              ) : (
-                                <span className="text-stone-400">No phone</span>
-                              )}
-                              {waLink && (
-                                <a
-                                  href={waLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-emerald-600 hover:text-emerald-700"
-                                  title="WhatsApp client"
-                                >
-                                  <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                    return (
+                      <div key={b.id} className="p-4 space-y-3 bg-white">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h4 className="font-bold text-stone-900 text-sm">{name}</h4>
+                            <div className="flex items-center gap-2 text-xs text-stone-600 mt-0.5">
+                              {phone && (
+                                <a href={`tel:${phone}`} className="font-semibold text-pink-700 underline flex items-center gap-1">
+                                  <Phone className="w-3 h-3" />
+                                  <span>{phone}</span>
                                 </a>
                               )}
+                              {email && <span className="text-[11px] text-stone-400">({email})</span>}
                             </div>
-                            {email && <div className="text-[10px] text-stone-400">{email}</div>}
-                          </td>
+                          </div>
 
-                          <td className="py-3 px-4">
-                            <div className="font-bold text-stone-900">{b.date}</div>
-                            <div className="text-[11px] text-stone-500">{time}</div>
-                          </td>
+                          <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full shrink-0 ${
+                            b.status === 'confirmed'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : b.status === 'pending'
+                              ? 'bg-amber-100 text-amber-800'
+                              : b.status === 'completed'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-stone-200 text-stone-700'
+                          }`}>
+                            {b.status}
+                          </span>
+                        </div>
 
-                          <td className="py-3 px-4 max-w-xs">
-                            <div className="flex flex-wrap gap-1">
-                              {srvNames.map((s, idx) => (
-                                <span key={idx} className="bg-pink-50 border border-pink-200 text-pink-900 px-1.5 py-0.5 rounded text-[10px] font-medium">
-                                  {s}
-                                </span>
-                              ))}
-                            </div>
-                          </td>
-
-                          <td className="py-3 px-4 font-bold text-[#8A2E44]">
+                        {/* Date, Time & Price */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-pink-50/50 p-2.5 rounded-xl border border-pink-100">
+                          <div className="flex items-center gap-3">
+                            <span className="font-semibold text-stone-800">{b.date}</span>
+                            <span className="text-stone-500">{time}</span>
+                          </div>
+                          <span className="font-serif font-bold text-pink-700">
                             Rs. {Number(b.totalPrice || 0).toLocaleString()}
-                          </td>
+                          </span>
+                        </div>
 
-                          <td className="py-3 px-4">
-                            <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full inline-block ${
-                              b.status === 'confirmed'
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : b.status === 'pending'
-                                ? 'bg-amber-100 text-amber-800'
-                                : b.status === 'completed'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-stone-200 text-stone-700'
-                            }`}>
-                              {b.status}
+                        {/* Services */}
+                        <div className="flex flex-wrap gap-1">
+                          {srvNames.map((s, idx) => (
+                            <span key={idx} className="bg-pink-50 border border-pink-200 text-pink-900 px-2 py-0.5 rounded text-[11px] font-medium">
+                              {s}
                             </span>
-                          </td>
+                          ))}
+                        </div>
 
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
-                              {/* Quick Confirm button */}
-                              {b.status === 'pending' && (
-                                <button
-                                  onClick={async () => {
-                                    if (!b.id) return;
-                                    await updateBookingStatus(b.id, 'confirmed');
-                                    showToast(`Booking for ${name} confirmed!`);
-                                  }}
-                                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
-                                  title="Confirm booking"
-                                >
-                                  Confirm
-                                </button>
+                        {b.notes && (
+                          <p className="text-[11px] text-stone-500 italic bg-stone-50 p-2 rounded-lg">
+                            Note: {b.notes}
+                          </p>
+                        )}
+
+                        {/* Mobile Actions with 44px touch targets */}
+                        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-pink-50">
+                          {waLink && (
+                            <a
+                              href={waLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="min-h-[40px] px-3 bg-[#25D366] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1 active:scale-95"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                              <span>WhatsApp</span>
+                            </a>
+                          )}
+
+                          {b.status === 'pending' && (
+                            <button
+                              onClick={async () => {
+                                if (!b.id) return;
+                                await updateBookingStatus(b.id, 'confirmed');
+                                showToast(`Booking for ${name} confirmed!`);
+                              }}
+                              className="min-h-[40px] px-3 bg-emerald-600 text-white rounded-xl text-xs font-bold active:scale-95 cursor-pointer"
+                            >
+                              Confirm
+                            </button>
+                          )}
+
+                          {b.status === 'confirmed' && (
+                            <button
+                              onClick={async () => {
+                                if (!b.id) return;
+                                await updateBookingStatus(b.id, 'completed');
+                                showToast(`Booking for ${name} completed!`);
+                              }}
+                              className="min-h-[40px] px-3 bg-blue-600 text-white rounded-xl text-xs font-bold active:scale-95 cursor-pointer"
+                            >
+                              Complete
+                            </button>
+                          )}
+
+                          {b.status !== 'cancelled' && (
+                            <button
+                              onClick={async () => {
+                                if (!b.id) return;
+                                await updateBookingStatus(b.id, 'cancelled');
+                                showToast(`Booking cancelled.`);
+                              }}
+                              className="min-h-[40px] px-3 border border-stone-300 text-stone-600 rounded-xl text-xs font-medium active:scale-95 cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => setViewingBooking(b)}
+                            className="min-h-[40px] px-3 bg-pink-100 text-pink-800 rounded-xl text-xs font-bold active:scale-95 cursor-pointer"
+                          >
+                            Details
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              if (!b.id) return;
+                              setConfirmModal({
+                                isOpen: true,
+                                title: 'Delete Booking Record?',
+                                message: `Are you sure you want to permanently delete booking for "${name}" on ${b.date}?`,
+                                confirmText: 'Delete Permanently',
+                                confirmVariant: 'danger',
+                                onConfirm: async () => {
+                                  await deleteBooking(b.id!);
+                                  showToast('Booking deleted.');
+                                  setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                                }
+                              });
+                            }}
+                            className="min-h-[40px] px-2.5 text-rose-500 hover:text-rose-700 active:scale-95 cursor-pointer"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop Table View (Hidden on mobile) */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#FAF7F2] text-stone-700 uppercase font-bold border-b border-stone-200">
+                      <tr>
+                        <th className="py-3 px-4">Customer</th>
+                        <th className="py-3 px-4">Contact</th>
+                        <th className="py-3 px-4">Date & Slot</th>
+                        <th className="py-3 px-4">Services</th>
+                        <th className="py-3 px-4">Price (NPR)</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-stone-100">
+                      {filteredBookings.map((b) => {
+                        const name = b.customerName || b.userName || 'Customer';
+                        const phone = b.customerPhone || b.phone || '';
+                        const email = b.customerEmail || b.email || '';
+                        const time = b.timeSlot || b.time || '';
+                        const srvNames = getBookingServiceNames(b);
+
+                        const cleanPhone = phone.replace(/[^0-9]/g, '');
+                        const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+                          `Namaste ${name}! This is Kamala Beauty Parlor regarding your appointment for ${b.date} at ${time}. Services: ${srvNames.join(', ')}. Status: ${b.status.toUpperCase()}.`
+                        )}` : '';
+
+                        return (
+                          <tr key={b.id} className="hover:bg-pink-50/30 transition-colors">
+                            <td className="py-3 px-4">
+                              <div className="font-bold text-stone-900">{name}</div>
+                              {b.notes && (
+                                <div className="text-[10px] text-stone-500 italic max-w-xs truncate">
+                                  Note: {b.notes}
+                                </div>
                               )}
-
-                              {/* Quick Complete button */}
-                              {b.status === 'confirmed' && (
-                                <button
-                                  onClick={async () => {
-                                    if (!b.id) return;
-                                    await updateBookingStatus(b.id, 'completed');
-                                    showToast(`Booking for ${name} marked completed!`);
-                                  }}
-                                  className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
-                                  title="Complete booking"
-                                >
-                                  Complete
-                                </button>
+                              {b.adminNote && (
+                                <div className="text-[10px] text-[#8A2E44] font-semibold max-w-xs truncate">
+                                  Admin: {b.adminNote}
+                                </div>
                               )}
+                            </td>
 
-                              {/* Quick Cancel button */}
-                              {b.status !== 'cancelled' && (
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-1.5">
+                                {phone ? (
+                                  <a href={`tel:${phone}`} className="font-semibold text-stone-800 hover:text-[#8A2E44]">
+                                    {phone}
+                                  </a>
+                                ) : (
+                                  <span className="text-stone-400">No phone</span>
+                                )}
+                                {waLink && (
+                                  <a
+                                    href={waLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-emerald-600 hover:text-emerald-700"
+                                    title="WhatsApp client"
+                                  >
+                                    <MessageCircle className="w-3.5 h-3.5 fill-current" />
+                                  </a>
+                                )}
+                              </div>
+                              {email && <div className="text-[10px] text-stone-400">{email}</div>}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <div className="font-bold text-stone-900">{b.date}</div>
+                              <div className="text-[11px] text-stone-500">{time}</div>
+                            </td>
+
+                            <td className="py-3 px-4 max-w-xs">
+                              <div className="flex flex-wrap gap-1">
+                                {srvNames.map((s, idx) => (
+                                  <span key={idx} className="bg-pink-50 border border-pink-200 text-pink-900 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+
+                            <td className="py-3 px-4 font-bold text-[#8A2E44]">
+                              Rs. {Number(b.totalPrice || 0).toLocaleString()}
+                            </td>
+
+                            <td className="py-3 px-4">
+                              <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full inline-block ${
+                                b.status === 'confirmed'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : b.status === 'pending'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : b.status === 'completed'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-stone-200 text-stone-700'
+                              }`}>
+                                {b.status}
+                              </span>
+                            </td>
+
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {/* Quick Confirm button */}
+                                {b.status === 'pending' && (
+                                  <button
+                                    onClick={async () => {
+                                      if (!b.id) return;
+                                      await updateBookingStatus(b.id, 'confirmed');
+                                      showToast(`Booking for ${name} confirmed!`);
+                                    }}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
+                                    title="Confirm booking"
+                                  >
+                                    Confirm
+                                  </button>
+                                )}
+
+                                {/* Quick Complete button */}
+                                {b.status === 'confirmed' && (
+                                  <button
+                                    onClick={async () => {
+                                      if (!b.id) return;
+                                      await updateBookingStatus(b.id, 'completed');
+                                      showToast(`Booking for ${name} marked completed!`);
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
+                                    title="Complete booking"
+                                  >
+                                    Complete
+                                  </button>
+                                )}
+
+                                {/* Quick Cancel button */}
+                                {b.status !== 'cancelled' && (
+                                  <button
+                                    onClick={async () => {
+                                      if (!b.id) return;
+                                      await updateBookingStatus(b.id, 'cancelled');
+                                      showToast(`Booking cancelled.`);
+                                    }}
+                                    className="border border-stone-300 hover:bg-stone-100 text-stone-600 px-2 py-1 rounded text-[10px] font-medium cursor-pointer"
+                                    title="Cancel booking"
+                                  >
+                                    Cancel
+                                  </button>
+                                )}
+
+                                {/* View Details modal */}
                                 <button
-                                  onClick={async () => {
-                                    if (!b.id) return;
-                                    await updateBookingStatus(b.id, 'cancelled');
-                                    showToast(`Booking cancelled.`);
-                                  }}
-                                  className="border border-stone-300 hover:bg-stone-100 text-stone-600 px-2 py-1 rounded text-[10px] font-medium cursor-pointer"
-                                  title="Cancel booking"
+                                  onClick={() => setViewingBooking(b)}
+                                  className="bg-pink-100 hover:bg-pink-200 text-pink-800 px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
+                                  title="View & edit booking details"
                                 >
-                                  Cancel
+                                  Details
                                 </button>
-                              )}
 
-                              {/* View Details modal */}
-                              <button
-                                onClick={() => setViewingBooking(b)}
-                                className="bg-pink-100 hover:bg-pink-200 text-pink-800 px-2 py-1 rounded text-[10px] font-bold cursor-pointer"
-                                title="View & edit booking details"
-                              >
-                                Details
-                              </button>
-
-                              {/* Delete button */}
-                              <button
-                                onClick={() => {
-                                  if (!b.id) return;
-                                  setConfirmModal({
-                                    isOpen: true,
-                                    title: 'Delete Booking Record?',
-                                    message: `Are you sure you want to permanently delete booking for "${name}" on ${b.date}?`,
-                                    confirmText: 'Delete Permanently',
-                                    confirmVariant: 'danger',
-                                    onConfirm: async () => {
-                                      await deleteBooking(b.id!);
-                                      showToast('Booking deleted.');
-                                      setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-                                    }
-                                  });
-                                }}
-                                className="text-rose-500 hover:text-rose-800 p-1 cursor-pointer"
-                                title="Delete booking"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                                {/* Delete button */}
+                                <button
+                                  onClick={() => {
+                                    if (!b.id) return;
+                                    setConfirmModal({
+                                      isOpen: true,
+                                      title: 'Delete Booking Record?',
+                                      message: `Are you sure you want to permanently delete booking for "${name}" on ${b.date}?`,
+                                      confirmText: 'Delete Permanently',
+                                      confirmVariant: 'danger',
+                                      onConfirm: async () => {
+                                        await deleteBooking(b.id!);
+                                        showToast('Booking deleted.');
+                                        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+                                      }
+                                    });
+                                  }}
+                                  className="text-rose-500 hover:text-rose-800 p-1 cursor-pointer"
+                                  title="Delete booking"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
