@@ -1,0 +1,6 @@
+{
+  "name": "Kamala Beauty Parlor",
+  "description": "Premier beauty parlour in Swayambhu, Kathmandu offering hair styling, bridal makeup, skincare, nail art, mehendi, and certified beautician training courses.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

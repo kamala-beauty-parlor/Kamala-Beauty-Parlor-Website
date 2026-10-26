@@ -1,0 +1,502 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile storing contact details",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "description": "Customer's full name",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer's email address",
+          "format": "email",
+          "maxLength": 150
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer's phone number in Nepal",
+          "maxLength": 25
+        },
+        "role": {
+          "type": "string",
+          "description": "User role: user or admin",
+          "enum": ["user", "customer", "admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Account creation timestamp"
+        }
+      },
+      "required": ["fullName", "email", "phone", "role"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Service appointment booking reservation",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the client who booked",
+          "maxLength": 128
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Full name of the client",
+          "maxLength": 100
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Phone number for appointment contact",
+          "maxLength": 25
+        },
+        "customerEmail": {
+          "type": "string",
+          "description": "Email address for appointment notifications",
+          "maxLength": 150
+        },
+        "services": {
+          "type": "array",
+          "description": "Array of { serviceId, name, price }"
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "Calculated total price in NPR"
+        },
+        "date": {
+          "type": "string",
+          "description": "Appointment date in YYYY-MM-DD format",
+          "maxLength": 15
+        },
+        "timeSlot": {
+          "type": "string",
+          "description": "Appointment time slot",
+          "maxLength": 30
+        },
+        "notes": {
+          "type": "string",
+          "description": "Special requests or hair/skin notes",
+          "maxLength": 500
+        },
+        "source": {
+          "type": "string",
+          "description": "Booking source: website or whatsapp",
+          "enum": ["website", "whatsapp"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Booking status",
+          "enum": ["pending", "confirmed", "completed", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["userId", "totalPrice", "date", "status"]
+    },
+    "ServiceCategory": {
+      "title": "ServiceCategory",
+      "description": "Salon service categories (Hair, Facial, Makeup, Nails, etc.)",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Category name",
+          "maxLength": 60
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order"
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Category visibility toggle"
+        }
+      },
+      "required": ["name", "order", "visible"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Salon service offering with pricing in NPR",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Service name",
+          "maxLength": 120
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Category ID or name",
+          "maxLength": 60
+        },
+        "price": {
+          "type": "number",
+          "description": "Price in NPR"
+        },
+        "priceNote": {
+          "type": "string",
+          "description": "Optional price note e.g. starting from",
+          "maxLength": 60
+        },
+        "duration": {
+          "type": "string",
+          "description": "Estimated duration e.g. 45 min",
+          "maxLength": 50
+        },
+        "description": {
+          "type": "string",
+          "description": "Service details and benefits",
+          "maxLength": 1000
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Public URL for service illustration",
+          "maxLength": 1000
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Whether to highlight on homepage"
+        },
+        "available": {
+          "type": "boolean",
+          "description": "Whether the service is currently offered"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display order index"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "price"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "Beautician and makeup training course",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Course title",
+          "maxLength": 150
+        },
+        "duration": {
+          "type": "string",
+          "description": "Course duration e.g. 3 months",
+          "maxLength": 50
+        },
+        "fee": {
+          "type": "number",
+          "description": "Tuition fee in NPR"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed curriculum overview",
+          "maxLength": 2000
+        },
+        "whatYouLearn": {
+          "type": "array",
+          "description": "List of key modules and skills taught"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Image URL representing the training",
+          "maxLength": 1000
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Visibility toggle"
+        },
+        "order": {
+          "type": "number",
+          "description": "Sort order"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["title", "duration", "fee", "description"]
+    },
+    "GalleryItem": {
+      "title": "GalleryItem",
+      "description": "Portfolio photo showcase entry",
+      "type": "object",
+      "properties": {
+        "imageUrl": {
+          "type": "string",
+          "description": "Direct image URL",
+          "maxLength": 1000
+        },
+        "caption": {
+          "type": "string",
+          "description": "Photo caption",
+          "maxLength": 150
+        },
+        "category": {
+          "type": "string",
+          "description": "Category: Bridal, Party, Hair, Nails, Skin, Other",
+          "maxLength": 60
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Visibility toggle"
+        },
+        "order": {
+          "type": "number",
+          "description": "Display sorting order"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["imageUrl", "category"]
+    },
+    "Section": {
+      "title": "Section",
+      "description": "Customizable homepage/landing page builder section",
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "string",
+          "description": "Page: home, about, services, training, contact",
+          "maxLength": 40
+        },
+        "type": {
+          "type": "string",
+          "description": "Section type: hero, text, imageText, cards, gallery, banner, testimonials, cta",
+          "maxLength": 40
+        },
+        "title": {
+          "type": "string",
+          "description": "Heading text",
+          "maxLength": 200
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Subheading or eyebrow text",
+          "maxLength": 300
+        },
+        "body": {
+          "type": "string",
+          "description": "Body paragraph or markdown",
+          "maxLength": 3000
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "Image URL if applicable",
+          "maxLength": 1000
+        },
+        "buttonText": {
+          "type": "string",
+          "description": "Call to action button text",
+          "maxLength": 60
+        },
+        "buttonLink": {
+          "type": "string",
+          "description": "Call to action link destination",
+          "maxLength": 200
+        },
+        "items": {
+          "type": "array",
+          "description": "List of cards/items"
+        },
+        "visible": {
+          "type": "boolean",
+          "description": "Whether section is visible on public site"
+        },
+        "order": {
+          "type": "number",
+          "description": "Ordering priority"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["title", "visible", "order"]
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Customer review and feedback",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of client",
+          "maxLength": 100
+        },
+        "text": {
+          "type": "string",
+          "description": "Review content",
+          "maxLength": 1000
+        },
+        "rating": {
+          "type": "number",
+          "description": "Rating out of 5"
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "rating", "text"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Contact form inquiry message",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Inquirer name",
+          "maxLength": 100
+        },
+        "phone": {
+          "type": "string",
+          "description": "Inquirer phone number",
+          "maxLength": 30
+        },
+        "email": {
+          "type": "string",
+          "description": "Inquirer email",
+          "maxLength": 150
+        },
+        "message": {
+          "type": "string",
+          "description": "Inquiry text",
+          "maxLength": 2000
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Whether admin has read the message"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Submission timestamp"
+        }
+      },
+      "required": ["name", "message"]
+    },
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "Global salon contact, business hours, and operational configuration",
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "tagline": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "googleMapsLink": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "googleMapsEmbedUrl": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "tiktokUrl": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "instagramUrl": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "openingHours": {
+          "type": "array"
+        },
+        "closedDates": {
+          "type": "array"
+        },
+        "timeSlots": {
+          "type": "array"
+        },
+        "slotCapacity": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": ["businessName", "phone", "email", "address"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with contact info and role"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Client salon appointment bookings"
+    },
+    "/serviceCategories/{categoryId}": {
+      "schema": "ServiceCategory",
+      "description": "Service categories (Hair, Facial, Makeup, etc.)"
+    },
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "List of beauty services with prices in NPR"
+    },
+    "/courses/{courseId}": {
+      "schema": "Course",
+      "description": "Professional beauty training courses"
+    },
+    "/gallery/{photoId}": {
+      "schema": "GalleryItem",
+      "description": "Showcase photos categorized by style"
+    },
+    "/sections/{sectionId}": {
+      "schema": "Section",
+      "description": "Dynamic homepage page-builder sections"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "Testimonial",
+      "description": "Client reviews and testimonials"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Customer contact messages"
+    },
+    "/settings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Global salon operational settings"
+    }
+  }
+}
