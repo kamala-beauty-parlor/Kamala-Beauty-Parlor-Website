@@ -333,26 +333,48 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
 
         <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={triggerLoadSampleData}
-            disabled={isSeeding}
-            className="bg-white hover:bg-rose-50 text-[#8A2E44] font-bold px-4 py-2.5 rounded-2xl text-xs sm:text-sm flex items-center gap-2 shadow-md transition disabled:opacity-50 cursor-pointer active:scale-95"
-          >
-            <Database className="w-4 h-4 text-[#8A2E44]" />
-            <span>{isSeeding ? 'Seeding Data...' : 'Load Sample Data'}</span>
-          </button>
-
-          <button
             onClick={async () => {
               await refreshAll();
               showToast('Database refreshed.');
             }}
-            className="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-2xl text-xs transition cursor-pointer"
+            className="bg-white/20 hover:bg-white/30 text-white px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
             title="Refresh database"
           >
             <RefreshCw className="w-4 h-4" />
+            <span>Refresh</span>
           </button>
         </div>
       </div>
+
+      {/* UNREAD INQUIRIES & CHAT ALERT BANNER (Ensures no message is left unseen) */}
+      {/* UNREAD INQUIRIES & CHAT ALERT BANNER (Ensures no message is left unseen) */}
+      {messages.filter(m => !m.read).length > 0 && (
+        <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-rose-600 text-white p-4 rounded-2xl shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-amber-300">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white text-amber-700 flex items-center justify-center font-bold flex-shrink-0 animate-bounce">
+              <MessageSquare className="w-5 h-5 text-amber-700" />
+            </div>
+            <div>
+              <p className="font-bold text-sm sm:text-base text-white">
+                {messages.filter(m => !m.read).length} Unread Customer Message{messages.filter(m => !m.read).length > 1 ? 's' : ''}!
+              </p>
+              <p className="text-xs text-amber-100">
+                New inquiries received from clients. Respond promptly so no client is left waiting.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setActiveTab('settings_messages');
+              setSettingsSubTab('messages');
+              setMessageFilter('unread');
+            }}
+            className="bg-white text-amber-950 hover:bg-amber-50 px-4 py-2.5 rounded-xl text-xs font-extrabold transition shadow-md self-start sm:self-auto cursor-pointer active:scale-95 whitespace-nowrap"
+          >
+            Open & Reply ({messages.filter(m => !m.read).length})
+          </button>
+        </div>
+      )}
 
       {/* TOAST NOTIFICATION */}
       {toastMsg && (

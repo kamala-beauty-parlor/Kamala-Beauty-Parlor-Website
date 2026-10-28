@@ -529,20 +529,8 @@ export const Home: React.FC<HomeProps> = ({ setCurrentTab, onSelectServiceToBook
         </div>
       </section>
 
-      {/* STICKY MOBILE BOOK NOW CTA BAR (Elevated just above the bottom nav on mobile) */}
-      <div className="fixed bottom-[60px] inset-x-0 sm:hidden z-30 p-2.5 bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-lg flex items-center justify-between gap-3">
-        <div className="pl-2">
-          <p className="text-[10px] text-pink-700 font-bold uppercase tracking-wider">Kathmandu Parlor</p>
-          <p className="font-serif text-xs font-bold text-stone-900">Make an Appointment</p>
-        </div>
-        <button
-          onClick={() => handleBook()}
-          className="min-h-[44px] bg-gradient-to-r from-pink-500 to-rose-500 text-white px-5 py-2 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5 active:scale-95 cursor-pointer"
-        >
-          <Calendar className="w-4 h-4" />
-          <span>Book Now</span>
-        </button>
-      </div>
     </div>
   );
 };
+
+export default Home;

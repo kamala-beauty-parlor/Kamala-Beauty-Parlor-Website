@@ -9,7 +9,7 @@ interface FloatingWhatsAppProps {
 export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ currentTab }) => {
   const { settings } = useSite();
 
-  // Hide on admin page to avoid distraction
+  // Hide on admin page to keep dashboard clean
   if (currentTab === 'admin' || (typeof window !== 'undefined' && window.location.hash === '#admin')) {
     return null;
   }
@@ -22,13 +22,13 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ currentTab }
   return (
     <div
       aria-label="Direct Contact Actions"
-      className="fixed bottom-20 sm:bottom-6 right-3 sm:right-6 z-30 flex flex-col items-end gap-2.5 pointer-events-auto"
+      className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] sm:bottom-6 left-3 sm:left-6 z-30 flex flex-col items-start gap-2.5 pointer-events-auto"
     >
       {/* 1. Quick Call Button */}
       <a
         href={`tel:${settings.phone}`}
         aria-label={`Call Kamala Beauty Parlor at ${settings.phone}`}
-        className="w-11 h-11 sm:w-auto sm:h-auto sm:px-3.5 sm:py-2.5 rounded-full bg-white text-[#8A2E44] border-2 border-pink-300 shadow-lg flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 hover:bg-pink-50"
+        className="w-11 h-11 sm:w-auto sm:h-auto sm:px-3.5 sm:py-2.5 rounded-full bg-white text-[#8A2E44] border-2 border-pink-300 shadow-lg flex items-center justify-center gap-1.5 transition-all duration-200 active:scale-95 hover:bg-pink-50 cursor-pointer"
       >
         <Phone className="w-5 h-5 text-[#8A2E44]" />
         <span className="hidden sm:inline font-bold text-xs">
@@ -42,7 +42,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ currentTab }
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp with Kamala Beauty Parlor"
-        className="w-12 h-12 sm:w-auto sm:h-auto sm:px-4 sm:py-3 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95"
+        className="w-12 h-12 sm:w-auto sm:h-auto sm:px-4 sm:py-3 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 cursor-pointer"
       >
         <div className="relative flex items-center justify-center">
           <MessageCircle className="w-6 h-6 fill-current" />

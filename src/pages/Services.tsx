@@ -231,3 +231,5 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
     </div>
   );
 };
+
+export default Services;

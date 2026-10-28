@@ -164,3 +164,4 @@ export interface SiteSettings {
   heroCtaText?: string;
   updatedAt?: string;
 }
+

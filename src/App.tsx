@@ -11,22 +11,23 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { BottomNav } from './components/BottomNav';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
-import { ChatBox } from './components/ChatBox';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
 
-// Code-split pages for high Lighthouse mobile performance & fast startup
-const Home = React.lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
-const Services = React.lazy(() => import('./pages/Services').then(m => ({ default: m.Services })));
-const Training = React.lazy(() => import('./pages/Training').then(m => ({ default: m.Training })));
-const Gallery = React.lazy(() => import('./pages/Gallery').then(m => ({ default: m.Gallery })));
-const About = React.lazy(() => import('./pages/About').then(m => ({ default: m.About })));
-const Contact = React.lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })));
-const Booking = React.lazy(() => import('./pages/Booking').then(m => ({ default: m.Booking })));
-const Login = React.lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
-const MyBookings = React.lazy(() => import('./pages/MyBookings').then(m => ({ default: m.MyBookings })));
+// Core public pages loaded directly for instant initial render with zero dynamic import failures
+import { Home } from './pages/Home';
+import { Services } from './pages/Services';
+import { Training } from './pages/Training';
+import { Gallery } from './pages/Gallery';
+import { About } from './pages/About';
+import { Contact } from './pages/Contact';
+import { Booking } from './pages/Booking';
+import { Login } from './pages/Login';
+import { MyBookings } from './pages/MyBookings';
+import { NotFound } from './pages/NotFound';
+
+// Admin dashboard is heavy (140KB) - code-split so clients never download it
 const Admin = React.lazy(() => import('./pages/Admin').then(m => ({ default: m.Admin })));
-const NotFound = React.lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 
 // Lightweight skeleton placeholder while chunks load
 const PageSkeleton = () => (
@@ -133,7 +134,7 @@ function MainApp() {
       <Navbar currentTab={currentTab} setCurrentTab={navigateToTab} />
       
       {/* Main Content Area */}
-      <main className="flex-1 pb-16 lg:pb-0">
+      <main className="flex-1 pb-20 md:pb-0">
         <Suspense fallback={<PageSkeleton />}>
           {renderContent()}
         </Suspense>
@@ -145,13 +146,8 @@ function MainApp() {
       {/* Mobile Fixed Bottom Navigation (Thumb-friendly 5 items) */}
       <BottomNav currentTab={currentTab} setCurrentTab={navigateToTab} />
 
-      {/* Floating Action Stack (Call & WhatsApp) - Never covers the bottom nav */}
-      {currentTab !== 'admin' && (
-        <>
-          <FloatingWhatsApp currentTab={currentTab} />
-          <ChatBox currentTab={currentTab} />
-        </>
-      )}
+      {/* Floating Action Stack (Call & WhatsApp on bottom-left) */}
+      {currentTab !== 'admin' && <FloatingWhatsApp currentTab={currentTab} />}
 
       {/* PWA Install Offer (Dismissible, shows after 2 visits) */}
       <PWAInstallBanner />

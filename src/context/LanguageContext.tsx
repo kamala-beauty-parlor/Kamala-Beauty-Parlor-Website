@@ -117,30 +117,13 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    try {
-      const saved = localStorage.getItem('kamala_language');
-      return saved === 'ne' ? 'ne' : 'en';
-    } catch {
-      return 'en';
-    }
-  });
+  const language: Language = 'en';
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    try {
-      localStorage.setItem('kamala_language', lang);
-    } catch (e) {
-      console.warn('Failed to save language preference:', e);
-    }
-  };
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'ne' : 'en');
-  };
+  const setLanguage = () => {};
+  const toggleLanguage = () => {};
 
   const t = (key: string, fallback?: string): string => {
-    const text = TRANSLATIONS[language]?.[key] || TRANSLATIONS.en[key];
+    const text = TRANSLATIONS.en[key];
     return text || fallback || key;
   };
 

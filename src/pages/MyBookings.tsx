@@ -417,6 +417,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ setCurrentTab, onSelectS
                       <span>{t('action.rebook', 'Rebook')}</span>
                     </button>
 
+
                     <button
                       type="button"
                       onClick={() => setReviewModalService(srvNames[0] || 'Bridal Makeup')}
