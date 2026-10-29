@@ -33,7 +33,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => {
   const { currentUser, userProfile, isAdmin, logout } = useAuth();
-  const { settings, messages } = useSite();
+  const { settings } = useSite();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -87,8 +87,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
     { id: 'gallery', label: 'Gallery', icon: ImageIcon },
     { id: 'about', label: 'About Us', icon: Heart },
   ];
-
-  const unreadMessagesCount = messages.filter((m) => !m.read).length;
 
   return (
     <header className="sticky top-0 z-40 w-full shadow-sm bg-white border-b-2 border-pink-200">
@@ -227,9 +225,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
             title="Menu"
           >
             <MoreVertical className="w-6 h-6 text-[#8A2E44]" />
-            {isAdmin && unreadMessagesCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-500 ring-2 ring-white animate-pulse" />
-            )}
           </button>
         </div>
 
@@ -296,18 +291,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
                       <ShieldCheck className="w-4 h-4 text-[#8A2E44]" />
                       <span>Admin Management</span>
                     </span>
-                    {unreadMessagesCount > 0 && (
-                      <span className="bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">
-                        {unreadMessagesCount} unread
-                      </span>
-                    )}
                   </div>
                   <button
                     onClick={() => handleNavClick('admin')}
                     className="w-full py-2.5 px-4 bg-[#8A2E44] text-white font-black text-xs sm:text-sm rounded-xl shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                   >
                     <ShieldCheck className="w-4 h-4 text-amber-300" />
-                    <span>Open Admin Dashboard (All 7 Sections)</span>
+                    <span>Open Admin Dashboard</span>
                   </button>
                 </div>
               )}

@@ -36,6 +36,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
 import { seedSampleData } from '../lib/firebase';
+import { normalizeImageUrl } from '../lib/imageUrl';
 import { 
   Booking, 
   BookingServiceItem,
@@ -44,7 +45,6 @@ import {
   CourseItem, 
   GalleryItem, 
   PageSection, 
-  ContactMessage, 
   SiteSettings,
   UserProfile 
 } from '../types';
@@ -68,7 +68,6 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
     gallery, 
     testimonials, 
     sections, 
-    messages, 
     bookings,
     customers,
     loading,
@@ -85,18 +84,13 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
     deleteGalleryItem,
     saveSettings,
     updateBookingStatus,
-    deleteBooking,
-    markMessageRead,
-    deleteMessage
+    deleteBooking
   } = useSite();
 
   // 7 explicit functional admin sections
   const [activeTab, setActiveTab] = useState<
-    'bookings' | 'services' | 'courses' | 'gallery' | 'sections' | 'customers' | 'settings_messages'
+    'bookings' | 'services' | 'courses' | 'gallery' | 'sections' | 'customers' | 'settings'
   >('bookings');
-
-  // Sub-tab for Settings & Messages
-  const [settingsSubTab, setSettingsSubTab] = useState<'messages' | 'settings'>('messages');
 
   // Page filter for Sections
   const [sectionPageFilter, setSectionPageFilter] = useState<string>('all');
@@ -111,9 +105,6 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
 
   // Search for Customers
   const [customerSearch, setCustomerSearch] = useState('');
-
-  // Search for Messages
-  const [messageFilter, setMessageFilter] = useState<'all' | 'unread' | 'read'>('all');
 
   // In-app Notification / Toast
   const [toastMsg, setToastMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -327,7 +318,7 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
             Kamala Beauty Parlor Admin Center
           </h1>
           <p className="text-xs sm:text-sm text-rose-100">
-            Control all 7 functional management areas: Bookings, Services & Prices, Courses, Gallery, Sections, Customers, and Messages & Settings.
+            Control all 7 functional management areas: Bookings, Services & Prices, Courses, Gallery, Sections, Customers, and Site Settings.
           </p>
         </div>
 
@@ -345,36 +336,6 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
           </button>
         </div>
       </div>
-
-      {/* UNREAD INQUIRIES & CHAT ALERT BANNER (Ensures no message is left unseen) */}
-      {/* UNREAD INQUIRIES & CHAT ALERT BANNER (Ensures no message is left unseen) */}
-      {messages.filter(m => !m.read).length > 0 && (
-        <div className="bg-gradient-to-r from-amber-500 via-amber-600 to-rose-600 text-white p-4 rounded-2xl shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-amber-300">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white text-amber-700 flex items-center justify-center font-bold flex-shrink-0 animate-bounce">
-              <MessageSquare className="w-5 h-5 text-amber-700" />
-            </div>
-            <div>
-              <p className="font-bold text-sm sm:text-base text-white">
-                {messages.filter(m => !m.read).length} Unread Customer Message{messages.filter(m => !m.read).length > 1 ? 's' : ''}!
-              </p>
-              <p className="text-xs text-amber-100">
-                New inquiries received from clients. Respond promptly so no client is left waiting.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              setActiveTab('settings_messages');
-              setSettingsSubTab('messages');
-              setMessageFilter('unread');
-            }}
-            className="bg-white text-amber-950 hover:bg-amber-50 px-4 py-2.5 rounded-xl text-xs font-extrabold transition shadow-md self-start sm:self-auto cursor-pointer active:scale-95 whitespace-nowrap"
-          >
-            Open & Reply ({messages.filter(m => !m.read).length})
-          </button>
-        </div>
-      )}
 
       {/* TOAST NOTIFICATION */}
       {toastMsg && (
@@ -404,7 +365,7 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
           { id: 'gallery', label: '4. Gallery', icon: ImageIcon, badge: gallery.length },
           { id: 'sections', label: '5. Website Sections', icon: Layers, badge: sections.length },
           { id: 'customers', label: '6. Customers', icon: Users, badge: aggregatedCustomers.length },
-          { id: 'settings_messages', label: '7. Messages & Settings', icon: MessageSquare, badge: messages.filter(m => !m.read).length }
+          { id: 'settings', label: '7. Site Settings', icon: SettingsIcon }
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -1345,8 +1306,10 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-pink-200 shadow-xs relative group flex flex-col justify-between">
                   <div className="aspect-square w-full bg-stone-100 overflow-hidden relative">
                     <img
-                      src={item.imageUrl}
+                      src={normalizeImageUrl(item.imageUrl)}
                       alt={item.caption || item.title || 'Salon photo'}
+                      referrerPolicy="no-referrer"
+                      crossOrigin="anonymous"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
@@ -1680,190 +1643,11 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
       )}
 
       {/* ============================================================== */}
-      {/* 7) MESSAGES & SITE SETTINGS SECTION */}
+      {/* 7) SITE SETTINGS SECTION */}
       {/* ============================================================== */}
-      {activeTab === 'settings_messages' && (
+      {activeTab === 'settings' && (
         <div className="space-y-6">
-          {/* Sub Tab Switcher */}
-          <div className="flex items-center gap-3 border-b border-pink-200 pb-2">
-            <button
-              onClick={() => setSettingsSubTab('messages')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer transition-all ${
-                settingsSubTab === 'messages'
-                  ? 'bg-pink-600 text-white shadow-xs'
-                  : 'bg-white text-stone-700 hover:bg-pink-50 border border-pink-200'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4" />
-              <span>Contact Messages</span>
-              {messages.filter(m => !m.read).length > 0 && (
-                <span className="bg-white text-pink-700 text-[10px] font-black px-1.5 rounded-full">
-                  {messages.filter(m => !m.read).length}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setSettingsSubTab('settings')}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer transition-all ${
-                settingsSubTab === 'settings'
-                  ? 'bg-pink-600 text-white shadow-xs'
-                  : 'bg-white text-stone-700 hover:bg-pink-50 border border-pink-200'
-              }`}
-            >
-              <SettingsIcon className="w-4 h-4" />
-              <span>Site & Business Settings</span>
-            </button>
-          </div>
-
-          {/* Sub-Tab 1: Messages */}
-          {settingsSubTab === 'messages' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-serif text-xl font-bold text-pink-950">
-                    Inbound Client Inquiries & Feedback
-                  </h3>
-                  <p className="text-xs text-stone-500">
-                    Messages submitted from the website Contact page.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-1.5 text-xs">
-                  {(['all', 'unread', 'read'] as const).map((filter) => (
-                    <button
-                      key={filter}
-                      onClick={() => setMessageFilter(filter)}
-                      className={`px-3 py-1 rounded-full capitalize font-bold cursor-pointer ${
-                        messageFilter === filter
-                          ? 'bg-pink-600 text-white'
-                          : 'bg-white text-stone-600 hover:bg-pink-50 border border-pink-200'
-                      }`}
-                    >
-                      {filter}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {messages.length === 0 ? (
-                <div className="bg-white p-12 rounded-3xl border text-center space-y-2">
-                  <Mail className="w-10 h-10 text-stone-300 mx-auto" />
-                  <p className="font-serif text-base font-bold text-stone-700">Inbox is empty</p>
-                  <p className="text-xs text-stone-400">Inquiries sent from the website contact form will appear here.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {messages
-                    .filter((m) => {
-                      if (messageFilter === 'unread') return !m.read;
-                      if (messageFilter === 'read') return m.read;
-                      return true;
-                    })
-                    .map((m) => {
-                      const cleanPhone = m.phone ? m.phone.replace(/[^0-9]/g, '') : '';
-                      const waLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                        `Namaste ${m.name}! This is Kamala Ma'am replying to your message sent to Kamala Beauty Parlor.`
-                      )}` : '';
-
-                      return (
-                        <div
-                          key={m.id}
-                          className={`p-5 rounded-2xl border transition-all ${
-                            m.read
-                              ? 'bg-white border-stone-200'
-                              : 'bg-pink-50/50 border-pink-300 shadow-xs ring-1 ring-pink-200'
-                          }`}
-                        >
-                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-serif font-bold text-sm text-stone-900">{m.name}</span>
-                                {!m.read && (
-                                  <span className="bg-rose-500 text-white text-[9px] font-black uppercase px-2 py-0.2 rounded-full">
-                                    New Unread
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex flex-wrap items-center gap-3 text-xs text-stone-500 mt-0.5">
-                                {m.phone && <span>Phone: {m.phone}</span>}
-                                {m.email && <span>Email: {m.email}</span>}
-                                <span>{new Date(m.createdAt).toLocaleString()}</span>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              {m.phone && (
-                                <a
-                                  href={`tel:${m.phone}`}
-                                  className="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 p-1.5 rounded-lg text-xs"
-                                  title="Call"
-                                >
-                                  <Phone className="w-3.5 h-3.5" />
-                                </a>
-                              )}
-
-                              {waLink && (
-                                <a
-                                  href={waLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="bg-emerald-500 hover:bg-emerald-600 text-white p-1.5 rounded-lg text-xs"
-                                  title="Reply on WhatsApp"
-                                >
-                                  <MessageCircle className="w-3.5 h-3.5 fill-current" />
-                                </a>
-                              )}
-
-                              <button
-                                onClick={async () => {
-                                  if (!m.id) return;
-                                  await markMessageRead(m.id, !m.read);
-                                  showToast(m.read ? 'Marked as unread' : 'Marked as read');
-                                }}
-                                className="bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer"
-                              >
-                                {m.read ? 'Mark Unread' : 'Mark Read'}
-                              </button>
-
-                              <button
-                                onClick={() => {
-                                  if (!m.id) return;
-                                  setConfirmModal({
-                                    isOpen: true,
-                                    title: 'Delete Message?',
-                                    message: `Delete message from "${m.name}"?`,
-                                    confirmText: 'Delete Message',
-                                    confirmVariant: 'danger',
-                                    onConfirm: async () => {
-                                      await deleteMessage(m.id!);
-                                      showToast('Message deleted.');
-                                      setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-                                    }
-                                  });
-                                }}
-                                className="text-stone-400 hover:text-rose-600 p-1 cursor-pointer"
-                                title="Delete"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <p className="text-xs text-stone-700 mt-3 bg-white p-3 rounded-xl border border-stone-100 leading-relaxed">
-                            {m.message}
-                          </p>
-                        </div>
-                      );
-                    })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Sub-Tab 2: Site Settings Form */}
-          {settingsSubTab === 'settings' && (
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-xs space-y-6">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-xs space-y-6">
               <div>
                 <h3 className="font-serif text-xl font-bold text-pink-950">
                   Business Information & Booking Controls
@@ -2041,7 +1825,6 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 </div>
               </form>
             </div>
-          )}
         </div>
       )}
 
@@ -2252,9 +2035,9 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
               <label className="font-bold text-stone-700 uppercase">Image URL (optional)</label>
               <input
                 type="text"
-                placeholder="https://images.unsplash.com/..."
+                placeholder="https://i.imgur.com/... or https://images.unsplash.com/..."
                 value={editingService.imageUrl || ''}
-                onChange={(e) => setEditingService({ ...editingService, imageUrl: e.target.value })}
+                onChange={(e) => setEditingService({ ...editingService, imageUrl: normalizeImageUrl(e.target.value) })}
                 className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
               />
             </div>
@@ -2294,7 +2077,11 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 onClick={async () => {
                   const sName = editingService.name || editingService.title;
                   if (!sName?.trim()) return;
-                  await saveService(editingService as ServiceItem);
+                  const finalService = {
+                    ...editingService,
+                    imageUrl: normalizeImageUrl(editingService.imageUrl)
+                  };
+                  await saveService(finalService as ServiceItem);
                   setEditingService(null);
                   showToast('Service saved successfully.');
                 }}
@@ -2386,9 +2173,9 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
               <label className="font-bold text-stone-700 uppercase">Image URL (optional)</label>
               <input
                 type="text"
-                placeholder="https://images.unsplash.com/..."
+                placeholder="https://i.imgur.com/... or https://images.unsplash.com/..."
                 value={editingCourse.imageUrl || ''}
-                onChange={(e) => setEditingCourse({ ...editingCourse, imageUrl: e.target.value })}
+                onChange={(e) => setEditingCourse({ ...editingCourse, imageUrl: normalizeImageUrl(e.target.value) })}
                 className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
               />
             </div>
@@ -2418,7 +2205,11 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 type="button"
                 onClick={async () => {
                   if (!editingCourse.title?.trim()) return;
-                  await saveCourse(editingCourse as CourseItem);
+                  const finalCourse = {
+                    ...editingCourse,
+                    imageUrl: normalizeImageUrl(editingCourse.imageUrl)
+                  };
+                  await saveCourse(finalCourse as CourseItem);
                   setEditingCourse(null);
                   showToast('Course saved successfully.');
                 }}
@@ -2448,11 +2239,18 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
               <label className="font-bold text-stone-700 uppercase">Image URL (Direct link) *</label>
               <input
                 type="text"
-                placeholder="https://images.unsplash.com/..."
+                placeholder="https://i.imgur.com/... or https://imgur.com/..."
                 value={editingGallery.imageUrl || ''}
-                onChange={(e) => setEditingGallery({ ...editingGallery, imageUrl: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const normalized = normalizeImageUrl(val);
+                  setEditingGallery({ ...editingGallery, imageUrl: normalized });
+                }}
                 className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
               />
+              <p className="text-[11px] text-stone-500 mt-1">
+                Tip: You can paste any Imgur link (e.g. <code className="text-pink-700 bg-pink-50 px-1 rounded font-mono">imgur.com/abc</code> or <code className="text-pink-700 bg-pink-50 px-1 rounded font-mono">i.imgur.com/abc.jpg</code>). It is automatically converted to a direct image.
+              </p>
             </div>
 
             {/* LIVE PREVIEW BOX */}
@@ -2461,10 +2259,17 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
               <div className="h-44 w-full rounded-2xl overflow-hidden border border-pink-200 bg-pink-50/40 flex items-center justify-center relative">
                 {editingGallery.imageUrl ? (
                   <img
-                    src={editingGallery.imageUrl}
+                    src={normalizeImageUrl(editingGallery.imageUrl)}
                     alt="Preview"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     className="w-full h-full object-cover"
                     onError={(e) => {
+                      const current = (e.target as HTMLImageElement).src;
+                      if (current.includes('i.imgur.com') && current.endsWith('.jpg')) {
+                        (e.target as HTMLImageElement).src = current.replace(/\.jpg$/i, '.png');
+                        return;
+                      }
                       (e.target as HTMLImageElement).src =
                         'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?auto=format&fit=crop&w=800&q=80';
                     }}
@@ -2518,7 +2323,11 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 type="button"
                 onClick={async () => {
                   if (!editingGallery.imageUrl?.trim()) return;
-                  await saveGalleryItem(editingGallery as GalleryItem);
+                  const finalPhoto = {
+                    ...editingGallery,
+                    imageUrl: normalizeImageUrl(editingGallery.imageUrl)
+                  };
+                  await saveGalleryItem(finalPhoto as GalleryItem);
                   setEditingGallery(null);
                   showToast('Photo added to gallery.');
                 }}
@@ -2618,9 +2427,9 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
               <label className="font-bold text-stone-700 uppercase">Image URL (optional)</label>
               <input
                 type="text"
-                placeholder="https://..."
+                placeholder="https://i.imgur.com/... or https://images.unsplash.com/..."
                 value={editingSection.imageUrl || ''}
-                onChange={(e) => setEditingSection({ ...editingSection, imageUrl: e.target.value })}
+                onChange={(e) => setEditingSection({ ...editingSection, imageUrl: normalizeImageUrl(e.target.value) })}
                 className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
               />
             </div>
@@ -2674,7 +2483,11 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                 type="button"
                 onClick={async () => {
                   if (!editingSection.title?.trim()) return;
-                  await saveSection(editingSection as PageSection);
+                  const finalSection = {
+                    ...editingSection,
+                    imageUrl: normalizeImageUrl(editingSection.imageUrl)
+                  };
+                  await saveSection(finalSection as PageSection);
                   setEditingSection(null);
                   showToast('Page section saved.');
                 }}
@@ -2903,3 +2716,5 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
     </div>
   );
 };
+
+export default Admin;

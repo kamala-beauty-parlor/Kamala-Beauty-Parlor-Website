@@ -24,9 +24,7 @@ import { Booking } from './pages/Booking';
 import { Login } from './pages/Login';
 import { MyBookings } from './pages/MyBookings';
 import { NotFound } from './pages/NotFound';
-
-// Admin dashboard is heavy (140KB) - code-split so clients never download it
-const Admin = React.lazy(() => import('./pages/Admin').then(m => ({ default: m.Admin })));
+import { Admin } from './pages/Admin';
 
 // Lightweight skeleton placeholder while chunks load
 const PageSkeleton = () => (

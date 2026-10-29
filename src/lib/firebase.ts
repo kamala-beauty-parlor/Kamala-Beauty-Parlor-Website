@@ -36,7 +36,16 @@ export const ADMIN_EMAIL = 'kamalaparlor@gmail.com';
 
 // Load real configuration from firebase-applet-config.json provisioned for this applet
 import appletConfig from '../../firebase-applet-config.json';
-export const firebaseConfig = appletConfig;
+export const firebaseConfig = {
+  ...appletConfig,
+  apiKey: (import.meta.env?.VITE_FIREBASE_API_KEY as string) || appletConfig.apiKey,
+  authDomain: (import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN as string) || appletConfig.authDomain,
+  projectId: (import.meta.env?.VITE_FIREBASE_PROJECT_ID as string) || appletConfig.projectId,
+  storageBucket: (import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET as string) || appletConfig.storageBucket,
+  messagingSenderId: (import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || appletConfig.messagingSenderId,
+  appId: (import.meta.env?.VITE_FIREBASE_APP_ID as string) || appletConfig.appId,
+  firestoreDatabaseId: (import.meta.env?.VITE_FIREBASE_DATABASE_ID as string) || appletConfig.firestoreDatabaseId,
+};
 
 // Initialize Firebase with provisioned config
 export const app = initializeApp(firebaseConfig);

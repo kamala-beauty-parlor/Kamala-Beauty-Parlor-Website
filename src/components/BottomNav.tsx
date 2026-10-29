@@ -1,7 +1,6 @@
 import React from 'react';
 import { Home, Scissors, Calendar, Image as ImageIcon, MoreHorizontal, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useSite } from '../context/SiteContext';
 
 interface BottomNavProps {
   currentTab: string;
@@ -11,11 +10,6 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab, onOpenMenu }) => {
   const { currentUser, isAdmin } = useAuth();
-  const { messages } = useSite();
-
-  const totalUnread = isAdmin 
-    ? messages.filter((m) => !m.read).length 
-    : 0;
 
   const handleTabSelect = (tab: string, isMenuTrigger?: boolean) => {
     if (isMenuTrigger) {
@@ -57,7 +51,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab,
       label: 'Menu',
       icon: MoreHorizontal,
       isMenuTrigger: true,
-      hasBadge: totalUnread > 0,
       hasDot: !!currentUser,
     },
   ];
@@ -101,10 +94,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab,
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110 stroke-[2.5]' : 'stroke-[2]'}`} />
-                {item.hasBadge && (
-                  <span className="absolute -top-1 -right-1.5 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white animate-pulse" />
-                )}
-                {!item.hasBadge && item.hasDot && (
+                {item.hasDot && (
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-1 ring-white" />
                 )}
               </div>
