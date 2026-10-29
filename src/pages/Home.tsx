@@ -219,7 +219,7 @@ export const Home: React.FC<HomeProps> = ({ setCurrentTab, onSelectServiceToBook
                   <span className="text-[11px] font-bold uppercase tracking-wider text-pink-700 bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-200">
                     {service.category}
                   </span>
-                  <span className="font-serif text-lg sm:text-xl font-bold text-pink-700">
+                  <span className="font-serif text-xl sm:text-2xl font-black text-[#8A2E44]">
                     Rs. {service.price.toLocaleString()}
                   </span>
                 </div>
@@ -228,13 +228,13 @@ export const Home: React.FC<HomeProps> = ({ setCurrentTab, onSelectServiceToBook
                   {service.title}
                 </h3>
 
-                <p className="text-stone-500 text-xs sm:text-sm mt-1.5 line-clamp-2 leading-relaxed">
+                <p className="text-stone-600 text-xs sm:text-sm mt-1.5 line-clamp-2 leading-relaxed">
                   {service.description || 'Professional beauty salon treatment by certified experts.'}
                 </p>
 
                 {service.duration && (
-                  <div className="flex items-center gap-1 text-xs text-stone-400 mt-2.5 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-pink-400" />
+                  <div className="flex items-center gap-1.5 text-xs text-stone-700 mt-2.5 font-bold">
+                    <Clock className="w-3.5 h-3.5 text-[#8A2E44]" />
                     <span>Duration: {service.duration}</span>
                   </div>
                 )}

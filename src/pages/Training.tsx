@@ -120,11 +120,11 @@ export const Training: React.FC<TrainingProps> = ({ setCurrentTab }) => {
 
                 <div className="p-6 sm:p-8 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="flex items-center gap-1.5 text-xs font-semibold text-stone-500">
-                      <Clock className="w-3.5 h-3.5 text-[#C59B27]" />
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-stone-800">
+                      <Clock className="w-4 h-4 text-[#C59B27]" />
                       Duration: {course.duration}
                     </span>
-                    <span className="font-serif text-2xl font-bold text-[#8A2E44]">
+                    <span className="font-serif text-2xl font-black text-[#8A2E44]">
                       Rs. {course.fee.toLocaleString()}
                     </span>
                   </div>

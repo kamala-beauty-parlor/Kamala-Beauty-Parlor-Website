@@ -549,12 +549,12 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                         </div>
 
                         {/* Date, Time & Price */}
-                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-pink-50/50 p-2.5 rounded-xl border border-pink-100">
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-stone-50 p-3 rounded-xl border border-pink-200">
                           <div className="flex items-center gap-3">
-                            <span className="font-semibold text-stone-800">{b.date}</span>
-                            <span className="text-stone-500">{time}</span>
+                            <span className="font-black text-stone-950 text-sm">{b.date}</span>
+                            <span className="font-bold text-pink-700 text-xs bg-pink-50 px-2 py-0.5 rounded border border-pink-200">{time}</span>
                           </div>
-                          <span className="font-serif font-bold text-pink-700">
+                          <span className="font-serif font-black text-base text-[#8A2E44]">
                             Rs. {Number(b.totalPrice || 0).toLocaleString()}
                           </span>
                         </div>
@@ -729,21 +729,21 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                             </td>
 
                             <td className="py-3 px-4">
-                              <div className="font-bold text-stone-900">{b.date}</div>
-                              <div className="text-[11px] text-stone-500">{time}</div>
+                              <div className="font-black text-stone-950 text-sm">{b.date}</div>
+                              <div className="text-xs font-bold text-pink-700 bg-pink-50 inline-block px-1.5 py-0.5 rounded border border-pink-200 mt-0.5">{time}</div>
                             </td>
 
                             <td className="py-3 px-4 max-w-xs">
                               <div className="flex flex-wrap gap-1">
                                 {srvNames.map((s, idx) => (
-                                  <span key={idx} className="bg-pink-50 border border-pink-200 text-pink-900 px-1.5 py-0.5 rounded text-[10px] font-medium">
+                                  <span key={idx} className="bg-pink-50 border border-pink-200 text-pink-900 px-2 py-0.5 rounded text-[11px] font-bold">
                                     {s}
                                   </span>
                                 ))}
                               </div>
                             </td>
 
-                            <td className="py-3 px-4 font-bold text-[#8A2E44]">
+                            <td className="py-3 px-4 font-serif font-black text-base text-[#8A2E44]">
                               Rs. {Number(b.totalPrice || 0).toLocaleString()}
                             </td>
 

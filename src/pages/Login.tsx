@@ -85,7 +85,7 @@ export const Login: React.FC<LoginProps> = ({ setCurrentTab, returnToTab = 'my-b
           return;
         }
 
-        const user = await registerWithEmail(email.trim(), password, fullName.trim());
+        const user = await registerWithEmail(email.trim(), password, fullName.trim(), phone.trim());
         handleAuthRedirect(user.email);
       } else {
         const user = await loginWithEmail(email.trim(), password);
@@ -270,23 +270,42 @@ export const Login: React.FC<LoginProps> = ({ setCurrentTab, returnToTab = 'my-b
         {/* Email & Password Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {activeTab === 'register' && (
-            <div>
-              <label className="text-xs font-bold text-stone-700 uppercase block mb-1">
-                Full Name *
-              </label>
-              <div className="relative">
-                <UserIcon className="w-4 h-4 text-pink-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  required
-                  autoComplete="name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Pooja Shrestha"
-                  className="w-full pl-10 pr-3 py-3 border border-pink-200 rounded-xl text-base sm:text-sm focus:outline-none focus:border-pink-500 bg-white min-h-[48px]"
-                />
+            <>
+              <div>
+                <label className="text-xs font-bold text-stone-700 uppercase block mb-1">
+                  Full Name *
+                </label>
+                <div className="relative">
+                  <UserIcon className="w-4 h-4 text-pink-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Pooja Shrestha"
+                    className="w-full pl-10 pr-3 py-3 border border-pink-200 rounded-xl text-base sm:text-sm focus:outline-none focus:border-pink-500 bg-white min-h-[48px]"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="text-xs font-bold text-stone-700 uppercase block mb-1">
+                  Phone Number (Nepal)
+                </label>
+                <div className="relative">
+                  <Phone className="w-4 h-4 text-pink-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="e.g. 9841234567"
+                    className="w-full pl-10 pr-3 py-3 border border-pink-200 rounded-xl text-base sm:text-sm focus:outline-none focus:border-pink-500 bg-white min-h-[48px]"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <div>

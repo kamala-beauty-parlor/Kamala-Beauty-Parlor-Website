@@ -417,6 +417,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
                 </div>
               </div>
 
+              {/* DEVELOPER CREDIT */}
+              <div className="pt-2 border-t border-pink-100 text-center">
+                <p className="text-[11px] text-stone-500 font-medium">
+                  Website made by <span className="text-[#8A2E44] font-bold">Er. Sagar Chokhal</span>
+                </p>
+              </div>
+
             </div>
           </div>
         </div>,

@@ -350,36 +350,69 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 9. Bookings listener
     const unsubBookings = onSnapshot(collection(db, 'bookings'), (snap) => {
-      if (!snap.empty) {
-        const list: Booking[] = [];
-        snap.forEach((d) => {
-          const data = d.data();
-          list.push({
-            id: d.id,
-            userName: data.userName || data.customerName || 'Customer',
-            customerName: data.customerName || data.userName || 'Customer',
-            phone: data.phone || data.customerPhone || '',
-            customerPhone: data.customerPhone || data.phone || '',
-            email: data.email || data.customerEmail || '',
-            customerEmail: data.customerEmail || data.email || '',
-            time: data.time || data.timeSlot || '',
-            timeSlot: data.timeSlot || data.time || '',
-            ...data
-          } as Booking);
-        });
-        list.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
-        setBookings(list);
-      }
+      const cloudList: Booking[] = [];
+      snap.forEach((d) => {
+        const data = d.data();
+        cloudList.push({
+          id: d.id,
+          userName: data.userName || data.customerName || 'Customer',
+          customerName: data.customerName || data.userName || 'Customer',
+          phone: data.phone || data.customerPhone || '',
+          customerPhone: data.customerPhone || data.phone || '',
+          email: data.email || data.customerEmail || '',
+          customerEmail: data.customerEmail || data.email || '',
+          time: data.time || data.timeSlot || '',
+          timeSlot: data.timeSlot || data.time || '',
+          ...data
+        } as Booking);
+      });
+
+      // Also merge with any local bookings stored
+      const localList = getLocalBookings();
+      const mergedMap = new Map<string, Booking>();
+      cloudList.forEach((b) => {
+        if (b.id) mergedMap.set(b.id, b);
+      });
+      localList.forEach((b) => {
+        if (b.id && !mergedMap.has(b.id)) {
+          mergedMap.set(b.id, b);
+        }
+      });
+
+      const combined = Array.from(mergedMap.values());
+      combined.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
+      setBookings(combined);
     }, (err) => console.warn('Bookings snapshot notice:', err.message));
 
     // 10. Users listener
     const unsubUsers = onSnapshot(collection(db, 'users'), (snap) => {
-      if (!snap.empty) {
-        const list: UserProfile[] = [];
-        snap.forEach((d) => list.push({ id: d.id, ...d.data() } as UserProfile));
-        setCustomers(list);
-        setStored('kamala_customers', list);
+      const list: UserProfile[] = [];
+      snap.forEach((d) => list.push({ id: d.id, ...d.data() } as UserProfile));
+
+      // Also merge any locally registered users
+      try {
+        const raw = localStorage.getItem('kamala_registered_users');
+        if (raw) {
+          const regMap = JSON.parse(raw);
+          Object.values(regMap).forEach((val: any) => {
+            if (val && val.email && !list.some((u) => u.email?.toLowerCase() === val.email?.toLowerCase())) {
+              list.push({
+                id: val.uid || `usr-${Date.now()}`,
+                fullName: val.fullName || 'Customer',
+                email: val.email,
+                phone: val.phone || '',
+                role: 'user',
+                createdAt: new Date().toISOString()
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Notice parsing registered users:', e);
       }
+
+      setCustomers(list);
+      setStored('kamala_customers', list);
     }, (err) => console.warn('Users snapshot notice:', err.message));
 
     const onBookingsUpdated = () => {

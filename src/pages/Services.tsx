@@ -148,11 +148,11 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
             >
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-pink-700 bg-pink-50 px-2.5 py-0.5 rounded-full border border-pink-200">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-pink-800 bg-pink-100/70 px-2.5 py-0.5 rounded-full border border-pink-200">
                     {service.category}
                   </span>
                   <div className="text-right">
-                    <span className="font-serif text-xl sm:text-2xl font-bold text-pink-600">
+                    <span className="font-serif text-2xl sm:text-3xl font-black text-[#8A2E44] tracking-tight">
                       Rs. {service.price.toLocaleString()}
                     </span>
                   </div>
@@ -162,14 +162,14 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
                   {service.title}
                 </h3>
 
-                <p className="text-stone-600 text-xs sm:text-sm mt-1.5 leading-relaxed">
+                <p className="text-stone-700 text-xs sm:text-sm mt-1.5 leading-relaxed font-normal">
                   {service.description ||
                     'Pampering salon treatment executed with professional precision and genuine cosmetics.'}
                 </p>
 
                 {service.duration && (
-                  <div className="flex items-center gap-1.5 text-xs text-stone-400 mt-2.5 font-medium">
-                    <Clock className="w-3.5 h-3.5 text-pink-400" />
+                  <div className="flex items-center gap-1.5 text-xs text-stone-700 mt-2.5 font-bold">
+                    <Clock className="w-3.5 h-3.5 text-[#8A2E44]" />
                     <span>Estimated time: {service.duration}</span>
                   </div>
                 )}

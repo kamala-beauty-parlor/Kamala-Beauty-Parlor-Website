@@ -382,16 +382,16 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ setCurrentTab, onSelectS
                       <h3 className="font-serif text-lg sm:text-xl font-bold text-pink-950">
                         {srvNames.join(' • ')}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-stone-600 mt-1">
-                        <span className="flex items-center gap-1 font-semibold text-stone-900">
-                          <Calendar className="w-3.5 h-3.5 text-pink-600" />
-                          {b.date}
+                      <div className="flex flex-wrap items-center gap-2.5 text-sm mt-1.5">
+                        <span className="flex items-center gap-1.5 font-black text-stone-950 bg-stone-100 px-3 py-1 rounded-lg border border-stone-200 text-xs sm:text-sm">
+                          <Calendar className="w-4 h-4 text-[#8A2E44]" />
+                          <span>{b.date}</span>
                         </span>
-                        <span className="flex items-center gap-1 font-semibold text-stone-900">
-                          <Clock className="w-3.5 h-3.5 text-pink-600" />
-                          {bookingTime}
+                        <span className="flex items-center gap-1.5 font-black text-stone-950 bg-stone-100 px-3 py-1 rounded-lg border border-stone-200 text-xs sm:text-sm">
+                          <Clock className="w-4 h-4 text-[#8A2E44]" />
+                          <span>{bookingTime}</span>
                         </span>
-                        <span className="font-serif text-sm font-bold text-pink-700 bg-pink-50 px-2 py-0.5 rounded-md">
+                        <span className="font-serif text-sm sm:text-base font-black text-[#8A2E44] bg-pink-100/80 border border-pink-200 px-3 py-1 rounded-lg">
                           Total: Rs. {b.totalPrice.toLocaleString()}
                         </span>
                       </div>

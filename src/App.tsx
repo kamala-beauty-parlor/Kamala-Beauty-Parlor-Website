@@ -10,7 +10,6 @@ import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { BottomNav } from './components/BottomNav';
-import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
 
@@ -144,9 +143,6 @@ function MainApp() {
 
       {/* Mobile Fixed Bottom Navigation (Thumb-friendly 5 items) */}
       <BottomNav currentTab={currentTab} setCurrentTab={navigateToTab} />
-
-      {/* Floating Action Stack (Call & WhatsApp on bottom-left) */}
-      {currentTab !== 'admin' && <FloatingWhatsApp currentTab={currentTab} />}
 
       {/* PWA Install Offer (Dismissible, shows after 2 visits) */}
       <PWAInstallBanner />

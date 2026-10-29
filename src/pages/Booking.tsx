@@ -29,7 +29,7 @@ const DRAFT_KEY = 'kamala_booking_draft';
 
 export const Booking: React.FC<BookingProps> = ({ setCurrentTab, preselectedService }) => {
   const { currentUser, userProfile } = useAuth();
-  const { services, categories: siteCategories, settings } = useSite();
+  const { services, categories: siteCategories, settings, saveBooking } = useSite();
   const { language, t } = useLanguage();
 
   // 3-Step Flow: 1 = Services, 2 = Date & Time, 3 = Confirm Summary, 4 = Success
@@ -316,6 +316,7 @@ Please confirm my appointment slot!`;
       };
 
       const confirmed = await placeBookingFast(newBooking);
+      await saveBooking(confirmed);
       setCompletedBooking(confirmed);
       sessionStorage.removeItem(DRAFT_KEY);
       setStep(4);
@@ -640,24 +641,26 @@ Please confirm my appointment slot!`;
                     type="button"
                     disabled={item.isClosed}
                     onClick={() => setDate(item.dateStr)}
-                    className={`flex flex-col items-center justify-center p-2.5 rounded-2xl min-w-[68px] sm:min-w-[76px] transition-all cursor-pointer min-h-[74px] active:scale-95 ${
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl min-w-[74px] sm:min-w-[82px] transition-all cursor-pointer min-h-[78px] active:scale-95 ${
                       isSelected
-                        ? 'bg-[#8A2E44] text-white shadow-md ring-2 ring-rose-300'
+                        ? 'bg-[#8A2E44] text-white shadow-lg ring-2 ring-rose-400'
                         : item.isClosed
-                        ? 'bg-stone-100 text-stone-300 opacity-50 cursor-not-allowed'
-                        : 'bg-white text-stone-700 border border-pink-200 hover:border-pink-400'
+                        ? 'bg-stone-100 text-stone-400 opacity-50 cursor-not-allowed border border-stone-200'
+                        : 'bg-white text-stone-900 border-2 border-pink-200 hover:border-pink-400 shadow-xs'
                     }`}
                   >
-                    <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                      isSelected ? 'text-pink-200' : 'text-stone-400'
+                    <span className={`text-[11px] font-extrabold uppercase tracking-wider ${
+                      isSelected ? 'text-rose-100' : 'text-stone-600'
                     }`}>
                       {item.dayName}
                     </span>
-                    <span className="font-serif text-xl font-bold my-0.5 leading-none">
+                    <span className={`font-serif text-2xl sm:text-3xl font-black my-0.5 leading-none ${
+                      isSelected ? 'text-white' : 'text-stone-900'
+                    }`}>
                       {item.dayNumber}
                     </span>
-                    <span className={`text-[10px] font-semibold ${
-                      isSelected ? 'text-pink-100' : 'text-stone-500'
+                    <span className={`text-[11px] font-bold ${
+                      isSelected ? 'text-rose-100' : 'text-stone-700'
                     }`}>
                       {item.monthName}
                     </span>
@@ -692,20 +695,20 @@ Please confirm my appointment slot!`;
                     type="button"
                     disabled={isFull}
                     onClick={() => setTime(slot)}
-                    className={`py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm flex flex-col items-center justify-center gap-0.5 transition-all min-h-[52px] active:scale-95 cursor-pointer border ${
+                    className={`py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm flex flex-col items-center justify-center gap-1 transition-all min-h-[56px] active:scale-95 cursor-pointer border-2 ${
                       isSelected
-                        ? 'bg-[#8A2E44] text-white border-[#8A2E44] shadow-md ring-2 ring-rose-200'
+                        ? 'bg-[#8A2E44] text-white border-[#8A2E44] shadow-md ring-2 ring-rose-300'
                         : isFull
                         ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed'
-                        : 'bg-white border-pink-200 text-stone-800 hover:border-pink-400'
+                        : 'bg-white border-pink-200 text-stone-900 hover:border-pink-400 shadow-xs'
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
-                      <Clock className={`w-3.5 h-3.5 ${isSelected ? 'text-pink-200' : 'text-pink-600'}`} />
-                      <span>{slot}</span>
+                      <Clock className={`w-4 h-4 ${isSelected ? 'text-rose-200' : 'text-[#8A2E44]'}`} />
+                      <span className={`font-black text-sm ${isSelected ? 'text-white' : 'text-stone-950'}`}>{slot}</span>
                     </div>
-                    <span className={`text-[9px] ${
-                      isSelected ? 'text-pink-200' : isFull ? 'text-stone-400' : 'text-stone-500'
+                    <span className={`text-[10px] font-bold ${
+                      isSelected ? 'text-rose-100' : isFull ? 'text-stone-400' : 'text-[#8A2E44]'
                     }`}>
                       {isFull ? 'Fully Booked' : `${settings.slotCapacity - bookedCount} spots left`}
                     </span>

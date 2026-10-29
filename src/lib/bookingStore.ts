@@ -1,5 +1,5 @@
 import { Booking } from '../types';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, setDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 const LOCAL_STORAGE_KEY = 'kamala_parlor_bookings';
@@ -119,8 +119,8 @@ export async function getBookedSlotsForDate(date: string): Promise<Record<string
 }
 
 /**
- * Place a booking immediately: Saves to localStorage in <10ms,
- * then background-syncs to Firestore with a fast 1.5s timeout.
+ * Place a booking immediately: Saves to localStorage and writes directly to Firestore bookings
+ * and guarantees the customer profile is registered in Firestore users so the Admin sees it.
  */
 export async function placeBookingFast(newBooking: Omit<Booking, 'id'>): Promise<Booking> {
   const generatedId = `KP-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
@@ -129,15 +129,29 @@ export async function placeBookingFast(newBooking: Omit<Booking, 'id'>): Promise
   // 1. Immediately persist locally
   saveLocalBooking(bookingWithId);
 
-  // 2. Background attempt to write to Firestore with 1.5s race
+  // 2. Write directly to Firestore
   try {
-    const firestorePromise = addDoc(collection(db, 'bookings'), newBooking);
-    const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 1500));
-    const result = await Promise.race([firestorePromise, timeoutPromise]);
+    const bookingDocData = {
+      ...newBooking,
+      id: generatedId,
+      updatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, 'bookings', generatedId), bookingDocData, { merge: true });
 
-    if (result && typeof result === 'object' && 'id' in result) {
-      bookingWithId.id = (result as any).id;
-      saveLocalBooking(bookingWithId);
+    // Also guarantee user profile document exists in Firestore users collection
+    if (newBooking.userId) {
+      await setDoc(
+        doc(db, 'users', newBooking.userId),
+        {
+          id: newBooking.userId,
+          fullName: newBooking.customerName || newBooking.userName || 'Client',
+          phone: newBooking.customerPhone || newBooking.phone || '',
+          email: newBooking.customerEmail || newBooking.email || '',
+          role: 'user',
+          updatedAt: new Date().toISOString()
+        },
+        { merge: true }
+      );
     }
   } catch (err) {
     console.warn('Firestore booking sync notice (local copy saved):', err);

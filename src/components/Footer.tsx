@@ -226,16 +226,21 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentTab }) => {
 
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-pink-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-          <p>© {new Date().getFullYear()} Kamala Beauty Parlor. All rights reserved.</p>
+          <div className="space-y-1 text-center sm:text-left">
+            <p>© {new Date().getFullYear()} Kamala Beauty Parlor. All rights reserved.</p>
+            <p className="text-[11px] text-stone-600 font-medium">
+              Website made by <span className="text-[#8A2E44] font-bold">Er. Sagar Chokhal</span>
+            </p>
+          </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             <span className="flex items-center gap-1">
               Made with <Heart className="w-3.5 h-3.5 text-pink-500 fill-current" /> in Kathmandu
             </span>
             <span>•</span>
             <button
               onClick={() => handleNav('login')}
-              className="text-pink-700 font-semibold hover:underline flex items-center gap-1"
+              className="text-pink-700 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
               Admin Portal
