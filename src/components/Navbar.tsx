@@ -86,7 +86,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
     { id: 'training', label: 'Training Courses', icon: GraduationCap },
     { id: 'gallery', label: 'Gallery', icon: ImageIcon },
     { id: 'about', label: 'About Us', icon: Heart },
-    { id: 'contact', label: 'Contact', icon: MapPin },
   ];
 
   const unreadMessagesCount = messages.filter((m) => !m.read).length;
@@ -144,16 +143,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
 
         {/* Right Actions for Laptop & Desktop */}
         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-          {/* Phone quick call on desktop */}
-          <a
-            href={`tel:${settings.phone}`}
-            className="hidden xl:flex items-center gap-1.5 text-xs font-extrabold text-stone-800 hover:text-[#8A2E44] px-3 py-1.5 rounded-full hover:bg-pink-100/80 transition"
-            title="Call Parlor"
-          >
-            <Phone className="w-3.5 h-3.5 text-pink-600" />
-            <span>{settings.phone}</span>
-          </a>
-
           {/* Book Appointment CTA Button (Desktop & Laptop only) */}
           <button
             onClick={() => handleNavClick('booking')}

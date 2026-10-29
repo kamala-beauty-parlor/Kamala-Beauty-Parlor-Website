@@ -129,15 +129,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentTab }) => {
                   onClick={() => handleNav('about')}
                   className="hover:text-pink-600 transition-colors"
                 >
-                  About Kamala & Story
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => handleNav('contact')}
-                  className="hover:text-pink-600 transition-colors"
-                >
-                  Contact & Location Map
+                  About Us & Contact Info
                 </button>
               </li>
               <li>

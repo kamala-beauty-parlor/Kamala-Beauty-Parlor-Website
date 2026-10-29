@@ -20,7 +20,6 @@ import { Services } from './pages/Services';
 import { Training } from './pages/Training';
 import { Gallery } from './pages/Gallery';
 import { About } from './pages/About';
-import { Contact } from './pages/Contact';
 import { Booking } from './pages/Booking';
 import { Login } from './pages/Login';
 import { MyBookings } from './pages/MyBookings';
@@ -50,8 +49,10 @@ function MainApp() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash && ['home', 'services', 'training', 'gallery', 'about', 'contact', 'booking', 'login', 'my-bookings', 'admin'].includes(hash)) {
+      if (hash && ['home', 'services', 'training', 'gallery', 'about', 'booking', 'login', 'my-bookings', 'admin'].includes(hash)) {
         setCurrentTab(hash);
+      } else if (hash === 'contact') {
+        setCurrentTab('about');
       }
     };
 
@@ -64,8 +65,9 @@ function MainApp() {
   }, []);
 
   const navigateToTab = (tab: string) => {
-    setCurrentTab(tab);
-    window.location.hash = tab;
+    const target = tab === 'contact' ? 'about' : tab;
+    setCurrentTab(target);
+    window.location.hash = target;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -99,9 +101,8 @@ function MainApp() {
           />
         );
       case 'about':
-        return <About setCurrentTab={navigateToTab} />;
       case 'contact':
-        return <Contact />;
+        return <About setCurrentTab={navigateToTab} />;
       case 'booking':
         return (
           <Booking
