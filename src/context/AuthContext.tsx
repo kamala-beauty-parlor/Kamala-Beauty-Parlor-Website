@@ -20,7 +20,7 @@ interface AuthContextType {
   loading: boolean;
   loginWithEmail: (email: string, pass: string) => Promise<User>;
   registerWithEmail: (email: string, pass: string, fullName?: string, phone?: string) => Promise<User>;
-  loginWithGoogle: (customEmail?: string, customName?: string) => Promise<User>;
+  loginWithGoogle: () => Promise<User>;
   resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -70,23 +70,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (e) {
       console.warn('Notice syncing user profile to Firestore:', e);
-    }
-
-    // Cache to registered users registry
-    if (user.email) {
-      try {
-        const raw = localStorage.getItem('kamala_registered_users');
-        const regUsers = raw ? JSON.parse(raw) : {};
-        regUsers[user.email.toLowerCase()] = {
-          uid: user.uid,
-          email: user.email,
-          fullName: profile.fullName,
-          phone: profile.phone
-        };
-        localStorage.setItem('kamala_registered_users', JSON.stringify(regUsers));
-      } catch (e) {
-        console.warn('Notice caching user to registry:', e);
-      }
     }
 
     setUserProfile(profile);
@@ -256,24 +239,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithGoogle = async (customEmail?: string, customName?: string) => {
-    if (customEmail && customEmail.trim()) {
-      const cleanEmail = customEmail.trim();
-      const isUserAdmin = isUserAdminEmail(cleanEmail);
-      const googleUser = {
-        uid: isUserAdmin ? 'admin-kamala-uid' : `google-${cleanEmail.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`,
-        email: cleanEmail,
-        displayName: customName?.trim() || (isUserAdmin ? 'Kamala KC (Admin)' : cleanEmail.split('@')[0]),
-        phoneNumber: '',
-        metadata: { creationTime: new Date().toISOString() }
-      } as unknown as User;
-
-      localStorage.setItem('kamala_local_auth_user', JSON.stringify(googleUser));
-      setCurrentUser(googleUser);
-      await syncUserProfile(googleUser, customName);
-      return googleUser;
-    }
-
+  const loginWithGoogle = async () => {
     const res = await signInWithPopup(auth, googleProvider);
     setCurrentUser(res.user);
     await syncUserProfile(res.user);

@@ -11,13 +11,7 @@ import {
   AlertCircle, 
   CheckCircle2,
   X,
-  KeyRound,
-  Copy,
-  Check,
-  ExternalLink,
-  Globe,
-  Sparkles,
-  Info
+  KeyRound 
 } from 'lucide-react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
@@ -44,13 +38,6 @@ export const Login: React.FC<LoginProps> = ({ setCurrentTab, returnToTab = 'my-b
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isDomainAuthError, setIsDomainAuthError] = useState(false);
-  const [googleAuthErrorType, setGoogleAuthErrorType] = useState<
-    'none' | 'unauthorized_domain' | 'operation_not_allowed' | 'popup_blocked' | 'other'
-  >('none');
-  const [copiedDomain, setCopiedDomain] = useState(false);
-  const [showQuickGoogleInput, setShowQuickGoogleInput] = useState(false);
-  const [quickGoogleEmail, setQuickGoogleEmail] = useState('');
-  const [quickGoogleName, setQuickGoogleName] = useState('');
 
   // Forgot password state
   const [showForgotModal, setShowForgotModal] = useState(false);
@@ -125,20 +112,9 @@ export const Login: React.FC<LoginProps> = ({ setCurrentTab, returnToTab = 'my-b
     }
   };
 
-  const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
-
-  const copyCurrentDomain = () => {
-    if (navigator.clipboard && currentHostname) {
-      navigator.clipboard.writeText(currentHostname);
-      setCopiedDomain(true);
-      setTimeout(() => setCopiedDomain(false), 2500);
-    }
-  };
-
   const handleGoogleSignIn = async () => {
     setErrorMessage('');
     setIsDomainAuthError(false);
-    setGoogleAuthErrorType('none');
     setIsLoading(true);
     try {
       const user = await loginWithGoogle();
@@ -147,35 +123,11 @@ export const Login: React.FC<LoginProps> = ({ setCurrentTab, returnToTab = 'my-b
       console.warn('Google sign in notice:', err);
       if (err.code === 'auth/unauthorized-domain') {
         setIsDomainAuthError(true);
-        setGoogleAuthErrorType('unauthorized_domain');
-      } else if (err.code === 'auth/operation-not-allowed') {
-        setGoogleAuthErrorType('operation_not_allowed');
-      } else if (err.code === 'auth/popup-blocked') {
-        setGoogleAuthErrorType('popup_blocked');
       } else if (err.code === 'auth/popup-closed-by-user') {
-        setErrorMessage('Google sign-in popup was closed before completing. Please try again.');
+        setErrorMessage('Sign in window was closed. Please try again.');
       } else {
-        setGoogleAuthErrorType('other');
-        setErrorMessage(err.message || 'Google sign in could not complete. You can sign in below or use your email.');
+        setErrorMessage('Google sign in was cancelled. Please use email & password below.');
       }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleQuickGoogleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!quickGoogleEmail.trim()) {
-      setErrorMessage('Please enter your Google email address.');
-      return;
-    }
-    setErrorMessage('');
-    setIsLoading(true);
-    try {
-      const user = await loginWithGoogle(quickGoogleEmail.trim(), quickGoogleName.trim());
-      handleAuthRedirect(user.email);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Unable to sign in with Google email.');
     } finally {
       setIsLoading(false);
     }
@@ -303,137 +255,12 @@ export const Login: React.FC<LoginProps> = ({ setCurrentTab, returnToTab = 'my-b
           <div className="flex-1 h-px bg-pink-100" />
         </div>
 
-        {/* Google Auth Issues Diagnostic & Troubleshooting Card */}
-        {googleAuthErrorType !== 'none' && (
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-300 text-amber-950 text-xs space-y-3 animate-in fade-in">
-            <div className="flex items-start gap-2.5">
-              <Globe className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div className="space-y-1">
-                <p className="font-bold text-amber-900 text-sm">
-                  {googleAuthErrorType === 'unauthorized_domain'
-                    ? 'Why "Continue with Google" is not working yet'
-                    : googleAuthErrorType === 'operation_not_allowed'
-                    ? 'Google Provider Not Enabled in Firebase'
-                    : googleAuthErrorType === 'popup_blocked'
-                    ? 'Popup Blocked by Browser'
-                    : 'Google Sign-In Notice'}
-                </p>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
-                  {googleAuthErrorType === 'unauthorized_domain' && (
-                    <>
-                      Firebase requires every website domain (like Netlify or this preview URL) to be registered under 
-                      <strong> Authorized Domains</strong> in your Firebase project for Google OAuth security.
-                    </>
-                  )}
-                  {googleAuthErrorType === 'operation_not_allowed' && (
-                    <>
-                      The Google provider must be enabled in your Firebase project (<strong>kamala-beauty-parlor</strong>) under 
-                      <strong> Authentication &gt; Sign-in method</strong>.
-                    </>
-                  )}
-                  {googleAuthErrorType === 'popup_blocked' && (
-                    <>
-                      Your browser or the preview environment blocked the Google sign-in popup window.
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            {/* Current Host & Copy Button */}
-            {googleAuthErrorType === 'unauthorized_domain' && currentHostname && (
-              <div className="bg-white p-2.5 rounded-xl border border-amber-200 flex items-center justify-between gap-2">
-                <div className="truncate">
-                  <span className="text-[10px] text-stone-500 uppercase block font-semibold">Your Current Domain:</span>
-                  <code className="text-xs font-mono font-bold text-stone-800 select-all truncate">
-                    {currentHostname}
-                  </code>
-                </div>
-                <button
-                  type="button"
-                  onClick={copyCurrentDomain}
-                  className="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold rounded-lg text-[11px] flex items-center gap-1 transition flex-shrink-0 cursor-pointer"
-                >
-                  {copiedDomain ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy Domain</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* 2-Step Fix Instructions */}
-            <div className="bg-amber-100/60 p-3 rounded-xl space-y-1.5 text-[11px] text-amber-900">
-              <p className="font-bold">How to fix in 1 minute in Firebase Console:</p>
-              <ol className="list-decimal list-inside space-y-1 pl-1">
-                <li>
-                  Go to{' '}
-                  <a
-                    href="https://console.firebase.google.com/project/kamala-beauty-parlor/authentication/settings"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold underline text-[#8A2E44] inline-flex items-center gap-0.5 hover:text-pink-700"
-                  >
-                    <span>Firebase Authentication &gt; Settings</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </li>
-                <li>Under <strong>Authorized domains</strong>, click <strong>Add domain</strong> and paste <code>{currentHostname || 'your-domain'}</code></li>
-                <li>Under <strong>Sign-in method</strong>, ensure <strong>Google</strong> is toggled to <strong>Enabled</strong>.</li>
-              </ol>
-            </div>
-
-            {/* Instant Fallback / Test Button */}
-            <div className="pt-1 flex flex-wrap items-center justify-between gap-2">
-              <button
-                type="button"
-                onClick={() => setShowQuickGoogleInput(!showQuickGoogleInput)}
-                className="text-xs font-bold text-[#8A2E44] hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{showQuickGoogleInput ? 'Hide Instant Google Sign-In' : 'Sign in directly with your Google Email instead →'}</span>
-              </button>
-            </div>
-
-            {/* Direct Google Email Input form */}
-            {showQuickGoogleInput && (
-              <form onSubmit={handleQuickGoogleSubmit} className="pt-2 border-t border-amber-200 space-y-2.5">
-                <p className="text-[11px] font-semibold text-stone-700">
-                  Instant Google Sign-In (Works without OAuth domain setup):
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. kamalaparlor@gmail.com"
-                    value={quickGoogleEmail}
-                    onChange={(e) => setQuickGoogleEmail(e.target.value)}
-                    className="p-2 bg-white border border-amber-300 rounded-xl text-xs focus:outline-none focus:border-[#8A2E44]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Full Name (optional)"
-                    value={quickGoogleName}
-                    onChange={(e) => setQuickGoogleName(e.target.value)}
-                    className="p-2 bg-white border border-amber-300 rounded-xl text-xs focus:outline-none focus:border-[#8A2E44]"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-2 bg-[#8A2E44] hover:bg-[#722335] text-white font-bold rounded-xl text-xs transition cursor-pointer disabled:opacity-50"
-                >
-                  {isLoading ? 'Signing In...' : 'Proceed with Google Account'}
-                </button>
-              </form>
-            )}
+        {isDomainAuthError && (
+          <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-950 text-xs space-y-1">
+            <p className="font-bold">Google Domain Authorization</p>
+            <p className="text-[11px] text-amber-800">
+              Please sign in directly using your email and password below.
+            </p>
           </div>
         )}
 
