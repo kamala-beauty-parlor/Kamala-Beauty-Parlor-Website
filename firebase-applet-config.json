@@ -1,12 +1,12 @@
 {
-  "projectId": "gen-lang-client-0000109276",
-  "appId": "1:704934169061:web:989484dd6f5d31281c070c",
-  "apiKey": "AIzaSyCRWYCusL9yoGpd6Mze8V8jfrC10eJeJAs",
-  "authDomain": "gen-lang-client-0000109276.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-kamalabeautyparl-1474fbeb-8e0e-4c63-8fb9-cb3eda3f3692",
-  "storageBucket": "gen-lang-client-0000109276.firebasestorage.app",
-  "messagingSenderId": "704934169061",
+  "projectId": "kamala-beauty-parlor",
+  "appId": "1:601163839825:web:1c6119dfa5253ce9613b70",
+  "apiKey": "AIzaSyAfEqakJAfX8nJNtYPP6rGo3UHC2_U4A8A",
+  "authDomain": "kamala-beauty-parlor.firebaseapp.com",
+  "storageBucket": "kamala-beauty-parlor.firebasestorage.app",
+  "messagingSenderId": "601163839825",
+  "firestoreDatabaseId": "(default)",
   "measurementId": "",
-  "oAuthClientId": "704934169061-b8911v6tcb7hs9ftulvl9qc3jd348m9f.apps.googleusercontent.com",
+  "oAuthClientId": "",
   "recaptchaSiteKey": ""
 }

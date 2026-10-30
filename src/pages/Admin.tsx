@@ -31,7 +31,10 @@ import {
   AlertTriangle,
   Mail,
   UserCheck,
-  ChevronRight
+  ChevronRight,
+  Heart,
+  MapPin,
+  Save
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
@@ -48,6 +51,7 @@ import {
   SiteSettings,
   UserProfile 
 } from '../types';
+import { formatDuration } from '../lib/formatters';
 
 interface ConfirmModalState {
   isOpen: boolean;
@@ -310,7 +314,7 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
           <div className="flex items-center gap-2">
             <span className="bg-white text-[#8A2E44] font-black text-[11px] uppercase px-3 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
               <ShieldCheck className="w-3.5 h-3.5 text-[#8A2E44]" />
-              Verified Owner
+              Kamala KC (Owner)
             </span>
             <span className="text-xs text-rose-100 font-medium">kamalaparlor@gmail.com</span>
           </div>
@@ -992,7 +996,7 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                             {srv.duration && (
                               <div className="flex items-center gap-1 text-[11px] text-stone-500 font-medium">
                                 <Clock className="w-3 h-3 text-pink-500" />
-                                <span>{srv.duration} min</span>
+                                <span>{formatDuration(srv.duration)}</span>
                               </div>
                             )}
 
@@ -1647,13 +1651,13 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
       {/* ============================================================== */}
       {activeTab === 'settings' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-xs space-y-6">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-xs space-y-8">
               <div>
-                <h3 className="font-serif text-xl font-bold text-pink-950">
-                  Business Information & Booking Controls
+                <h3 className="font-serif text-2xl font-bold text-pink-950">
+                  Website Settings & Customization
                 </h3>
-                <p className="text-xs text-stone-500">
-                  Update salon contact information, opening hours, booking slot limits, and Google Maps embed.
+                <p className="text-xs text-stone-500 mt-1">
+                  Customize every section of the website in real time: Salon Experience & Stats, Opening Hours & Walk-In Policy, Founder Profile, Story, Contact Info, and Booking Controls.
                 </p>
               </div>
 
@@ -1663,7 +1667,7 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                   setIsSavingSettings(true);
                   try {
                     await saveSettings(formSettings);
-                    showToast('Site settings updated successfully!');
+                    showToast('All website settings saved and updated successfully!');
                   } catch (err) {
                     console.error(err);
                     showToast('Failed to save settings.', 'error');
@@ -1671,156 +1675,388 @@ export const Admin: React.FC<{ setCurrentTab: (tab: string) => void }> = ({ setC
                     setIsSavingSettings(false);
                   }
                 }}
-                className="space-y-4 text-xs"
+                className="space-y-8 text-xs"
               >
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 1. SALON EXPERIENCE & CREDIBILITY STATS */}
+                <div className="p-5 bg-pink-50/50 rounded-2xl border border-pink-100 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-pink-200/80 pb-2">
+                    <Sparkles className="w-4 h-4 text-[#8A2E44]" />
+                    <h4 className="font-serif text-sm font-bold text-pink-950 uppercase tracking-wide">
+                      1. Salon Experience & Credibility Highlights
+                    </h4>
+                  </div>
+                  <p className="text-[11px] text-stone-600">
+                    These badges appear prominently in the "Our Heritage & Expertise" section on the About page and across the site.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Experience Stat Value</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 10+ Years"
+                        value={formSettings.experienceYears ?? '10+ Years'}
+                        onChange={(e) => setFormSettings({ ...formSettings, experienceYears: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500 font-semibold text-pink-950"
+                      />
+                      <span className="text-[10px] text-stone-400">Main highlighted number or metric</span>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Experience Stat Label</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Salon Experience"
+                        value={formSettings.experienceLabel ?? 'Salon Experience'}
+                        onChange={(e) => setFormSettings({ ...formSettings, experienceLabel: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                      <span className="text-[10px] text-stone-400">Subtitle under experience number</span>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Cosmetics Quality Stat Value</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 100%"
+                        value={formSettings.cosmeticsQuality ?? '100%'}
+                        onChange={(e) => setFormSettings({ ...formSettings, cosmeticsQuality: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500 font-semibold text-pink-950"
+                      />
+                      <span className="text-[10px] text-stone-400">Product purity or quality metric</span>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Cosmetics Quality Stat Label</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Genuine Cosmetics"
+                        value={formSettings.cosmeticsLabel ?? 'Genuine Cosmetics'}
+                        onChange={(e) => setFormSettings({ ...formSettings, cosmeticsLabel: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                      <span className="text-[10px] text-stone-400">Subtitle under quality percentage</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. OPENING HOURS & WALK-IN POLICY */}
+                <div className="p-5 bg-pink-50/50 rounded-2xl border border-pink-100 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-pink-200/80 pb-2">
+                    <Clock className="w-4 h-4 text-[#8A2E44]" />
+                    <h4 className="font-serif text-sm font-bold text-pink-950 uppercase tracking-wide">
+                      2. Opening Hours & Walk-In Policy
+                    </h4>
+                  </div>
+                  <p className="text-[11px] text-stone-600">
+                    Controls the opening schedule card, timing badges, and walk-in recommendations on the About & Contact pages.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Weekday Schedule Label</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Sunday – Friday"
+                        value={formSettings.weekdayLabel ?? 'Sunday – Friday'}
+                        onChange={(e) => setFormSettings({ ...formSettings, weekdayLabel: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Weekday Operating Hours</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 08:00 AM – 07:00 PM"
+                        value={formSettings.weekdayHours ?? '08:00 AM – 07:00 PM'}
+                        onChange={(e) => setFormSettings({ ...formSettings, weekdayHours: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Weekend Schedule Label</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Saturday"
+                        value={formSettings.weekendLabel ?? 'Saturday'}
+                        onChange={(e) => setFormSettings({ ...formSettings, weekendLabel: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Weekend Operating Hours</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 09:00 AM – 05:00 PM"
+                        value={formSettings.weekendHours ?? '09:00 AM – 05:00 PM'}
+                        onChange={(e) => setFormSettings({ ...formSettings, weekendHours: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="font-bold text-stone-700 uppercase">Business Name</label>
-                    <input
-                      type="text"
-                      value={formSettings.businessName}
-                      onChange={(e) => setFormSettings({ ...formSettings, businessName: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                    <label className="font-bold text-stone-700 uppercase">Walk-In & Appointment Policy Text</label>
+                    <textarea
+                      rows={2}
+                      placeholder="e.g. Appointments prioritized; walk-ins warmly welcomed subject to stylist availability."
+                      value={formSettings.walkInPolicy ?? 'Appointments prioritized; walk-ins warmly welcomed subject to stylist availability.'}
+                      onChange={(e) => setFormSettings({ ...formSettings, walkInPolicy: e.target.value })}
+                      className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                    />
+                    <span className="text-[10px] text-stone-400">Notice shown to clients regarding appointment bookings vs walk-in visits</span>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-stone-700 uppercase">Salon Sanctuary & Ambience Description</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Describe salon cleanliness, atmosphere, hygiene..."
+                      value={formSettings.sanctuaryDescription ?? 'Our salon provides a relaxing, private sanctuary with hygienic stations, soothing aromatherapy, and authentic Nepali hospitality.'}
+                      onChange={(e) => setFormSettings({ ...formSettings, sanctuaryDescription: e.target.value })}
+                      className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                    />
+                  </div>
+                </div>
+
+                {/* 3. FOUNDER PROFILE & ABOUT STORY */}
+                <div className="p-5 bg-pink-50/50 rounded-2xl border border-pink-100 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-pink-200/80 pb-2">
+                    <Heart className="w-4 h-4 text-[#8A2E44]" />
+                    <h4 className="font-serif text-sm font-bold text-pink-950 uppercase tracking-wide">
+                      3. Founder Profile & Salon Story (About Page)
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Founder Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Kamala KC"
+                        value={formSettings.founderName ?? 'Kamala KC'}
+                        onChange={(e) => setFormSettings({ ...formSettings, founderName: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500 font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Founder Role / Title</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Founder & Master Beautician"
+                        value={formSettings.founderRole ?? 'Founder & Master Beautician'}
+                        onChange={(e) => setFormSettings({ ...formSettings, founderRole: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-stone-700 uppercase">Founder Personal Quote</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Inspiring quote from Kamala KC..."
+                      value={formSettings.founderQuote ?? 'True beauty radiates from confident self-care. Every woman deserves dedicated artistry, gentle touch, and premium genuine cosmetics.'}
+                      onChange={(e) => setFormSettings({ ...formSettings, founderQuote: e.target.value })}
+                      className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-stone-700 uppercase">Tagline</label>
-                    <input
-                      type="text"
-                      value={formSettings.tagline}
-                      onChange={(e) => setFormSettings({ ...formSettings, tagline: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                    <label className="font-bold text-stone-700 uppercase">Salon Heritage & Origin Story</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Story of how the salon was founded..."
+                      value={formSettings.aboutStoryText ?? 'Founded in Kathmandu, Kamala Beauty Parlor began with a passionate dedication to bridal radiance, modern hair transformations, and skincare rejuvenation. Located near sacred Swayambhu, we have blossomed into one of Kathmandu’s most trusted beauty sanctuaries.'}
+                      onChange={(e) => setFormSettings({ ...formSettings, aboutStoryText: e.target.value })}
+                      className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-stone-700 uppercase">Phone Number</label>
-                    <input
-                      type="text"
-                      value={formSettings.phone}
-                      onChange={(e) => setFormSettings({ ...formSettings, phone: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                    <label className="font-bold text-stone-700 uppercase">Salon Mission & Artistry Philosophy</label>
+                    <textarea
+                      rows={2}
+                      placeholder="Mission statement..."
+                      value={formSettings.aboutMissionText ?? 'Our mission is to celebrate authentic beauty through modern artistry, premium international cosmetics, and hygienic care. We ensure every visit leaves you rejuvenated, luminous, and radiant.'}
+                      onChange={(e) => setFormSettings({ ...formSettings, aboutMissionText: e.target.value })}
+                      className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
                     />
                   </div>
+                </div>
 
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">WhatsApp Number (with country code)</label>
-                    <input
-                      type="text"
-                      value={formSettings.whatsapp}
-                      onChange={(e) => setFormSettings({ ...formSettings, whatsapp: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
+                {/* 4. BUSINESS CONTACT DETAILS & SOCIALS */}
+                <div className="p-5 bg-pink-50/50 rounded-2xl border border-pink-100 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-pink-200/80 pb-2">
+                    <MapPin className="w-4 h-4 text-[#8A2E44]" />
+                    <h4 className="font-serif text-sm font-bold text-pink-950 uppercase tracking-wide">
+                      4. Contact Information & Locations
+                    </h4>
                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Business Name</label>
+                      <input
+                        type="text"
+                        value={formSettings.businessName}
+                        onChange={(e) => setFormSettings({ ...formSettings, businessName: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">Email Address</label>
-                    <input
-                      type="email"
-                      value={formSettings.email}
-                      onChange={(e) => setFormSettings({ ...formSettings, email: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Tagline</label>
+                      <input
+                        type="text"
+                        value={formSettings.tagline}
+                        onChange={(e) => setFormSettings({ ...formSettings, tagline: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Phone Number</label>
+                      <input
+                        type="text"
+                        value={formSettings.phone}
+                        onChange={(e) => setFormSettings({ ...formSettings, phone: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">WhatsApp Number (with country code)</label>
+                      <input
+                        type="text"
+                        value={formSettings.whatsapp}
+                        onChange={(e) => setFormSettings({ ...formSettings, whatsapp: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Email Address</label>
+                      <input
+                        type="email"
+                        value={formSettings.email}
+                        onChange={(e) => setFormSettings({ ...formSettings, email: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Physical Address (Kathmandu)</label>
+                      <input
+                        type="text"
+                        value={formSettings.address}
+                        onChange={(e) => setFormSettings({ ...formSettings, address: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Opening Hours Description (Compact summary)</label>
+                      <input
+                        type="text"
+                        value={typeof formSettings.openingHours === 'string' ? formSettings.openingHours : 'Sun-Fri: 8AM-7PM'}
+                        onChange={(e) => setFormSettings({ ...formSettings, openingHours: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Instagram Profile URL</label>
+                      <input
+                        type="text"
+                        value={formSettings.instagramUrl}
+                        onChange={(e) => setFormSettings({ ...formSettings, instagramUrl: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">TikTok Profile URL</label>
+                      <input
+                        type="text"
+                        value={formSettings.tiktokUrl}
+                        onChange={(e) => setFormSettings({ ...formSettings, tiktokUrl: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-stone-700 uppercase">Google Maps Link</label>
+                      <input
+                        type="text"
+                        value={formSettings.mapsLink}
+                        onChange={(e) => setFormSettings({ ...formSettings, mapsLink: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-stone-700 uppercase">Google Maps Embed URL</label>
+                      <input
+                        type="text"
+                        value={formSettings.mapsEmbedUrl}
+                        onChange={(e) => setFormSettings({ ...formSettings, mapsEmbedUrl: e.target.value })}
+                        className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      />
+                    </div>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">Physical Address (Kathmandu)</label>
-                    <input
-                      type="text"
-                      value={formSettings.address}
-                      onChange={(e) => setFormSettings({ ...formSettings, address: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
+                {/* 5. BOOKING CONTROLS & TIME SLOTS */}
+                <div className="p-5 bg-pink-50/50 rounded-2xl border border-pink-100 space-y-4">
+                  <div className="flex items-center gap-2 border-b border-pink-200/80 pb-2">
+                    <Calendar className="w-4 h-4 text-[#8A2E44]" />
+                    <h4 className="font-serif text-sm font-bold text-pink-950 uppercase tracking-wide">
+                      5. Booking Capacity & Available Time Slots
+                    </h4>
                   </div>
-
                   <div>
-                    <label className="font-bold text-stone-700 uppercase">Opening Hours Description</label>
-                    <input
-                      type="text"
-                      value={typeof formSettings.openingHours === 'string' ? formSettings.openingHours : 'Sun-Fri: 8AM-7PM'}
-                      onChange={(e) => setFormSettings({ ...formSettings, openingHours: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">Slot Capacity (Bookings per time slot)</label>
+                    <label className="font-bold text-stone-700 uppercase">Slot Capacity (Max concurrent bookings per slot)</label>
                     <input
                       type="number"
                       min={1}
                       max={20}
                       value={formSettings.slotCapacity}
                       onChange={(e) => setFormSettings({ ...formSettings, slotCapacity: Number(e.target.value) })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      className="w-full sm:w-48 p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-stone-700 uppercase">Instagram Profile URL</label>
+                    <label className="font-bold text-stone-700 uppercase">
+                      Available Daily Time Slots (Comma-separated)
+                    </label>
                     <input
                       type="text"
-                      value={formSettings.instagramUrl}
-                      onChange={(e) => setFormSettings({ ...formSettings, instagramUrl: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
+                      value={formSettings.timeSlots.join(', ')}
+                      onChange={(e) =>
+                        setFormSettings({
+                          ...formSettings,
+                          timeSlots: e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                        })
+                      }
+                      className="w-full p-2.5 border border-pink-200 bg-white rounded-xl mt-1 focus:outline-none focus:border-pink-500"
                     />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">TikTok Profile URL</label>
-                    <input
-                      type="text"
-                      value={formSettings.tiktokUrl}
-                      onChange={(e) => setFormSettings({ ...formSettings, tiktokUrl: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">Google Maps Link</label>
-                    <input
-                      type="text"
-                      value={formSettings.mapsLink}
-                      onChange={(e) => setFormSettings({ ...formSettings, mapsLink: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-stone-700 uppercase">Google Maps Embed URL</label>
-                    <input
-                      type="text"
-                      value={formSettings.mapsEmbedUrl}
-                      onChange={(e) => setFormSettings({ ...formSettings, mapsEmbedUrl: e.target.value })}
-                      className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                    />
+                    <span className="text-[10px] text-stone-400">Example: 08:00 AM, 09:30 AM, 11:00 AM, 12:30 PM, 02:00 PM, 03:30 PM, 05:00 PM, 06:30 PM</span>
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <label className="font-bold text-stone-700 uppercase">
-                    Available Time Slots (Comma-separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={formSettings.timeSlots.join(', ')}
-                    onChange={(e) =>
-                      setFormSettings({
-                        ...formSettings,
-                        timeSlots: e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
-                      })
-                    }
-                    className="w-full p-2.5 border border-pink-200 rounded-xl mt-1 focus:outline-none focus:border-pink-500"
-                  />
-                </div>
-
-                <div className="pt-4 border-t flex justify-end">
+                <div className="pt-4 border-t border-pink-200 flex items-center justify-between">
+                  <p className="text-[11px] text-stone-500">
+                    Changes take effect immediately on public pages upon saving.
+                  </p>
                   <button
                     type="submit"
                     disabled={isSavingSettings}
-                    className="bg-[#8A2E44] hover:bg-[#722335] text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow transition cursor-pointer disabled:opacity-50"
+                    className="bg-[#8A2E44] hover:bg-[#722335] text-white px-7 py-3 rounded-xl font-bold text-xs shadow-md transition cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   >
-                    {isSavingSettings ? 'Saving Settings...' : 'Save Site Settings'}
+                    <Save className="w-4 h-4" />
+                    {isSavingSettings ? 'Saving All Settings...' : 'Save Website Settings'}
                   </button>
                 </div>
               </form>

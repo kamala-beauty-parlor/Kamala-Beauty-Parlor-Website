@@ -22,6 +22,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { ImageWithFallback } from '../components/ImageWithFallback';
 import { ReviewModal } from '../components/ReviewModal';
 import { DynamicSections } from '../components/DynamicSections';
+import { formatDuration } from '../lib/formatters';
 
 interface HomeProps {
   setCurrentTab: (tab: string) => void;
@@ -235,7 +236,7 @@ export const Home: React.FC<HomeProps> = ({ setCurrentTab, onSelectServiceToBook
                 {service.duration && (
                   <div className="flex items-center gap-1.5 text-xs text-stone-700 mt-2.5 font-bold">
                     <Clock className="w-3.5 h-3.5 text-[#8A2E44]" />
-                    <span>Duration: {service.duration}</span>
+                    <span>Duration: {formatDuration(service.duration)}</span>
                   </div>
                 )}
               </div>

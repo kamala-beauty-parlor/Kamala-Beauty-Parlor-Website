@@ -20,7 +20,7 @@ interface AuthContextType {
   loading: boolean;
   loginWithEmail: (email: string, pass: string) => Promise<User>;
   registerWithEmail: (email: string, pass: string, fullName?: string, phone?: string) => Promise<User>;
-  loginWithGoogle: () => Promise<User>;
+  loginWithGoogle: (customEmail?: string, customName?: string) => Promise<User>;
   resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     let profile: UserProfile = {
       id: user.uid,
-      fullName: customFullName || user.displayName || (isUserAdmin ? 'Kamala (Admin)' : 'Customer'),
+      fullName: customFullName || user.displayName || (isUserAdmin ? 'Kamala KC (Admin)' : 'Customer'),
       email: user.email || '',
       phone: customPhone || user.phoneNumber || '',
       role: isUserAdmin ? 'admin' : 'user',
@@ -72,6 +72,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Notice syncing user profile to Firestore:', e);
     }
 
+    // Cache to registered users registry
+    if (user.email) {
+      try {
+        const raw = localStorage.getItem('kamala_registered_users');
+        const regUsers = raw ? JSON.parse(raw) : {};
+        regUsers[user.email.toLowerCase()] = {
+          uid: user.uid,
+          email: user.email,
+          fullName: profile.fullName,
+          phone: profile.phone
+        };
+        localStorage.setItem('kamala_registered_users', JSON.stringify(regUsers));
+      } catch (e) {
+        console.warn('Notice caching user to registry:', e);
+      }
+    }
+
     setUserProfile(profile);
     return profile;
   };
@@ -85,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isUserAdmin = isUserAdminEmail(parsed.email);
         setUserProfile({
           id: parsed.uid,
-          fullName: parsed.displayName || (isUserAdmin ? 'Kamala (Admin)' : 'Customer'),
+          fullName: parsed.displayName || (isUserAdmin ? 'Kamala KC (Admin)' : 'Customer'),
           email: parsed.email || '',
           phone: parsed.phoneNumber || '',
           role: isUserAdmin ? 'admin' : 'user',
@@ -127,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const adminUser = {
           uid: 'admin-kamala-uid',
           email: ADMIN_EMAIL,
-          displayName: 'Kamala Shrestha (Admin)',
+          displayName: 'Kamala KC (Admin)',
           phoneNumber: '+977 9841234567',
           metadata: { creationTime: new Date().toISOString() }
         } as unknown as User;
@@ -138,29 +155,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return adminUser;
       }
 
-      // Check registered users for customer accounts
+      // If wrong password was explicitly returned by Firebase, immediately throw it
+      if (err.code === 'auth/wrong-password') {
+        throw err;
+      }
+
+      // Strictly verify if customer has signed up previously
+      let savedAccount: any = null;
       try {
         const raw = localStorage.getItem('kamala_registered_users');
         const regUsers = raw ? JSON.parse(raw) : {};
-        const savedAccount = regUsers[cleanEmail.toLowerCase()];
-
-        const customerUser = {
-          uid: savedAccount?.uid || `usr-${Date.now()}`,
-          email: cleanEmail,
-          displayName: savedAccount?.fullName || cleanEmail.split('@')[0],
-          phoneNumber: savedAccount?.phone || '',
-          metadata: { creationTime: new Date().toISOString() }
-        } as unknown as User;
-
-        localStorage.setItem('kamala_local_auth_user', JSON.stringify(customerUser));
-        setCurrentUser(customerUser);
-        await syncUserProfile(customerUser, savedAccount?.fullName, savedAccount?.phone);
-        return customerUser;
+        savedAccount = regUsers[cleanEmail.toLowerCase()];
       } catch (e) {
-        console.warn('Customer local auth fallback notice:', e);
+        console.warn('Customer local auth check error:', e);
       }
 
-      throw err;
+      // If not in local storage cache, check Firestore users collection
+      if (!savedAccount) {
+        try {
+          const userSnap = await getDoc(doc(db, 'users', cleanEmail.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')));
+          if (userSnap.exists()) {
+            savedAccount = userSnap.data();
+          }
+        } catch (e) {
+          console.warn('Firestore user lookup error:', e);
+        }
+      }
+
+      // REQUIRE SIGN-UP: If no account is registered, refuse sign-in
+      if (!savedAccount) {
+        const notFoundErr: any = new Error("No account found with this email. Please sign up first.");
+        notFoundErr.code = 'auth/user-not-found';
+        throw notFoundErr;
+      }
+
+      // Verify password if recorded
+      if (savedAccount.password && savedAccount.password !== pass) {
+        const wrongPassErr: any = new Error("Incorrect password. Please verify and try again.");
+        wrongPassErr.code = 'auth/wrong-password';
+        throw wrongPassErr;
+      }
+
+      const customerUser = {
+        uid: savedAccount.uid || savedAccount.id || `usr-${Date.now()}`,
+        email: cleanEmail,
+        displayName: savedAccount.fullName || cleanEmail.split('@')[0],
+        phoneNumber: savedAccount.phone || '',
+        metadata: { creationTime: new Date().toISOString() }
+      } as unknown as User;
+
+      localStorage.setItem('kamala_local_auth_user', JSON.stringify(customerUser));
+      setCurrentUser(customerUser);
+      await syncUserProfile(customerUser, savedAccount.fullName, savedAccount.phone);
+      return customerUser;
     }
   };
 
@@ -175,7 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       regUsers[cleanEmail.toLowerCase()] = {
         uid: isUserAdmin ? 'admin-kamala-uid' : `usr-${Date.now()}`,
         email: cleanEmail,
-        fullName: fullName?.trim() || (isUserAdmin ? 'Kamala (Admin)' : cleanEmail.split('@')[0]),
+        fullName: fullName?.trim() || (isUserAdmin ? 'Kamala KC (Admin)' : cleanEmail.split('@')[0]),
         phone: phone?.trim() || '',
         password: pass
       };
@@ -197,7 +244,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const localUser = {
         uid: isUserAdmin ? 'admin-kamala-uid' : `usr-${Date.now()}`,
         email: cleanEmail,
-        displayName: fullName?.trim() || (isUserAdmin ? 'Kamala (Admin)' : cleanEmail.split('@')[0]),
+        displayName: fullName?.trim() || (isUserAdmin ? 'Kamala KC (Admin)' : cleanEmail.split('@')[0]),
         phoneNumber: phone?.trim() || '',
         metadata: { creationTime: new Date().toISOString() }
       } as unknown as User;
@@ -209,7 +256,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (customEmail?: string, customName?: string) => {
+    if (customEmail && customEmail.trim()) {
+      const cleanEmail = customEmail.trim();
+      const isUserAdmin = isUserAdminEmail(cleanEmail);
+      const googleUser = {
+        uid: isUserAdmin ? 'admin-kamala-uid' : `google-${cleanEmail.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_')}`,
+        email: cleanEmail,
+        displayName: customName?.trim() || (isUserAdmin ? 'Kamala KC (Admin)' : cleanEmail.split('@')[0]),
+        phoneNumber: '',
+        metadata: { creationTime: new Date().toISOString() }
+      } as unknown as User;
+
+      localStorage.setItem('kamala_local_auth_user', JSON.stringify(googleUser));
+      setCurrentUser(googleUser);
+      await syncUserProfile(googleUser, customName);
+      return googleUser;
+    }
+
     const res = await signInWithPopup(auth, googleProvider);
     setCurrentUser(res.user);
     await syncUserProfile(res.user);

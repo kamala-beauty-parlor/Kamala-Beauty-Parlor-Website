@@ -13,6 +13,7 @@ import {
 import { useSite } from '../context/SiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { DynamicSections } from '../components/DynamicSections';
+import { formatDuration } from '../lib/formatters';
 
 interface ServicesProps {
   setCurrentTab: (tab: string) => void;
@@ -170,7 +171,7 @@ export const Services: React.FC<ServicesProps> = ({ setCurrentTab, onSelectServi
                 {service.duration && (
                   <div className="flex items-center gap-1.5 text-xs text-stone-700 mt-2.5 font-bold">
                     <Clock className="w-3.5 h-3.5 text-[#8A2E44]" />
-                    <span>Estimated time: {service.duration}</span>
+                    <span>Estimated time: {formatDuration(service.duration)}</span>
                   </div>
                 )}
               </div>

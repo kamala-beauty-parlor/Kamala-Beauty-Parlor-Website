@@ -143,7 +143,7 @@ export const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose }) =
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Kamala Shrestha"
+                      placeholder="e.g. Kamala KC"
                       className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-pink-200 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 bg-white"
                     />
                   </div>

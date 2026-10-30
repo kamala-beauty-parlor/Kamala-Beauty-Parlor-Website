@@ -37,24 +37,28 @@ export const ADMIN_EMAIL = 'kamalaparlor@gmail.com';
 // Load real configuration from firebase-applet-config.json provisioned for this applet
 import appletConfig from '../../firebase-applet-config.json';
 export const firebaseConfig = {
-  ...appletConfig,
-  apiKey: (import.meta.env?.VITE_FIREBASE_API_KEY as string) || appletConfig.apiKey,
-  authDomain: (import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN as string) || appletConfig.authDomain,
-  projectId: (import.meta.env?.VITE_FIREBASE_PROJECT_ID as string) || appletConfig.projectId,
-  storageBucket: (import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET as string) || appletConfig.storageBucket,
-  messagingSenderId: (import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || appletConfig.messagingSenderId,
-  appId: (import.meta.env?.VITE_FIREBASE_APP_ID as string) || appletConfig.appId,
-  firestoreDatabaseId: (import.meta.env?.VITE_FIREBASE_DATABASE_ID as string) || appletConfig.firestoreDatabaseId,
+  apiKey: (import.meta.env?.VITE_FIREBASE_API_KEY as string) || appletConfig.apiKey || 'AIzaSyAfEqakJAfX8nJNtYPP6rGo3UHC2_U4A8A',
+  authDomain: (import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN as string) || appletConfig.authDomain || 'kamala-beauty-parlor.firebaseapp.com',
+  projectId: (import.meta.env?.VITE_FIREBASE_PROJECT_ID as string) || appletConfig.projectId || 'kamala-beauty-parlor',
+  storageBucket: (import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET as string) || appletConfig.storageBucket || 'kamala-beauty-parlor.firebasestorage.app',
+  messagingSenderId: (import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || appletConfig.messagingSenderId || '601163839825',
+  appId: (import.meta.env?.VITE_FIREBASE_APP_ID as string) || appletConfig.appId || '1:601163839825:web:1c6119dfa5253ce9613b70',
+  firestoreDatabaseId: (import.meta.env?.VITE_FIREBASE_DATABASE_ID as string) || (appletConfig as any).firestoreDatabaseId || '',
 };
 
-// Initialize Firebase with provisioned config
+// Initialize Firebase with user's project SDK
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+
+// Connect to default Firestore database for kamala-beauty-parlor
+const dbId = firebaseConfig.firestoreDatabaseId;
+export const db = dbId && dbId !== '(default)' && !dbId.includes('ai-studio-')
+  ? getFirestore(app, dbId)
+  : getFirestore(app);
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   businessName: 'Kamala Beauty Parlor',
@@ -77,7 +81,28 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   ],
   heroTitle: 'Radiant Beauty & Expert Care in Kathmandu',
   heroSubtitle: 'Step into luxury and self-care at Swayambhu, Panchdhara. We specialize in bridal artistry, premium hair transformations, rejuvenating facials, and certified beautician masterclasses.',
-  heroCtaText: 'Book Appointment'
+  heroCtaText: 'Book Appointment',
+
+  // Salon Experience & Stats
+  experienceYears: '10+ Years',
+  experienceLabel: 'Salon Experience',
+  cosmeticsQuality: '100%',
+  cosmeticsLabel: 'Genuine Cosmetics',
+
+  // Opening Hours & Walk-In Policy
+  walkInPolicy: 'Appointments prioritized, walk-ins welcome',
+  weekdayLabel: 'Sunday – Friday',
+  weekdayHours: '8:00 AM – 7:00 PM',
+  weekendLabel: 'Saturday',
+  weekendHours: '9:00 AM – 5:00 PM',
+
+  // Founder & Story
+  founderName: 'Kamala KC',
+  founderRole: 'Founder & Beauty Specialist',
+  founderQuote: 'Beauty is about feeling relaxed, confident, and true to yourself. We treat every client like family.',
+  aboutStoryText: 'Welcome to Kamala Beauty Parlor, located in the peaceful neighborhood of Swayambhu, Panchdhara, Kathmandu.',
+  aboutMissionText: 'Founded by veteran beautician and makeup artist Kamala KC, our parlor is dedicated purely to the beauty, wellness, and self-confidence of women in Kathmandu. Whether you visit for relaxing hair therapies, precision eyebrow threading, rejuvenating facials, or your once-in-a-lifetime bridal makeover, you will experience personalized pampering in a sterile, welcoming environment.',
+  sanctuaryDescription: 'Located right at Panchdhara, Swayambhu with accessible road access and parking. Our parlor features a clean, air-conditioned interior where you can unwind while receiving personalized beauty care.'
 };
 
 export const SEED_SERVICES: Omit<ServiceItem, 'id'>[] = [

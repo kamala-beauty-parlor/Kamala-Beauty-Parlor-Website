@@ -37,21 +37,29 @@ export const About: React.FC<AboutProps> = ({ setCurrentTab }) => {
           </h1>
 
           <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
-            Welcome to <strong>Kamala Beauty Parlor</strong>, located in the peaceful neighborhood of Swayambhu, Panchdhara, Kathmandu.
+            {settings.aboutStoryText || 'Welcome to Kamala Beauty Parlor, located in the peaceful neighborhood of Swayambhu, Panchdhara, Kathmandu.'}
           </p>
 
           <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
-            Founded by veteran beautician and makeup artist <strong>Kamala</strong>, our parlor is dedicated purely to the beauty, wellness, and self-confidence of women in Kathmandu. Whether you visit for relaxing hair therapies, precision eyebrow threading, rejuvenating facials, or your once-in-a-lifetime bridal makeover, you will experience personalized pampering in a sterile, welcoming environment.
+            {settings.aboutMissionText || `Founded by veteran beautician and makeup artist ${settings.founderName || 'Kamala KC'}, our parlor is dedicated purely to the beauty, wellness, and self-confidence of women in Kathmandu. Whether you visit for relaxing hair therapies, precision eyebrow threading, rejuvenating facials, or your once-in-a-lifetime bridal makeover, you will experience personalized pampering in a sterile, welcoming environment.`}
           </p>
 
           <div className="grid grid-cols-2 gap-4 pt-2">
             <div className="p-4 bg-pink-50/50 rounded-2xl border border-pink-100">
-              <p className="font-serif text-2xl font-bold text-pink-600">10+ Years</p>
-              <p className="text-xs text-stone-500 mt-1 font-medium">Salon Experience</p>
+              <p className="font-serif text-2xl font-bold text-pink-600">
+                {settings.experienceYears || '10+ Years'}
+              </p>
+              <p className="text-xs text-stone-500 mt-1 font-medium">
+                {settings.experienceLabel || 'Salon Experience'}
+              </p>
             </div>
             <div className="p-4 bg-pink-50/50 rounded-2xl border border-pink-100">
-              <p className="font-serif text-2xl font-bold text-pink-600">100%</p>
-              <p className="text-xs text-stone-500 mt-1 font-medium">Genuine Cosmetics</p>
+              <p className="font-serif text-2xl font-bold text-pink-600">
+                {settings.cosmeticsQuality || '100%'}
+              </p>
+              <p className="text-xs text-stone-500 mt-1 font-medium">
+                {settings.cosmeticsLabel || 'Genuine Cosmetics'}
+              </p>
             </div>
           </div>
         </div>
@@ -68,13 +76,13 @@ export const About: React.FC<AboutProps> = ({ setCurrentTab }) => {
             </div>
 
             <h3 className="font-serif text-2xl font-bold text-pink-950">
-              Kamala
+              {settings.founderName || 'Kamala KC'}
             </h3>
             <p className="text-xs font-bold uppercase tracking-widest text-pink-600 mt-0.5">
-              Founder & Beauty Specialist
+              {settings.founderRole || 'Founder & Beauty Specialist'}
             </p>
             <p className="text-xs text-stone-600 mt-2 px-2 italic">
-              "Beauty is about feeling relaxed, confident, and true to yourself. We treat every client like family."
+              "{settings.founderQuote || 'Beauty is about feeling relaxed, confident, and true to yourself. We treat every client like family.'}"
             </p>
           </div>
         </div>
@@ -248,25 +256,27 @@ export const About: React.FC<AboutProps> = ({ setCurrentTab }) => {
                   <h3 className="font-serif text-lg font-bold text-pink-950 leading-tight">
                     Opening Hours & Walk-In Policy
                   </h3>
-                  <p className="text-xs text-stone-500">Appointments prioritized, walk-ins welcome</p>
+                  <p className="text-xs text-stone-500">
+                    {settings.walkInPolicy || 'Appointments prioritized, walk-ins welcome'}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-1">
                 <div className="bg-white p-3.5 rounded-2xl border border-pink-100 shadow-2xs">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block">
-                    Sunday – Friday
+                    {settings.weekdayLabel || 'Sunday – Friday'}
                   </span>
                   <span className="text-sm sm:text-base font-extrabold text-pink-700 mt-0.5 block">
-                    8:00 AM – 7:00 PM
+                    {settings.weekdayHours || '8:00 AM – 7:00 PM'}
                   </span>
                 </div>
                 <div className="bg-white p-3.5 rounded-2xl border border-pink-100 shadow-2xs">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 block">
-                    Saturday
+                    {settings.weekendLabel || 'Saturday'}
                   </span>
                   <span className="text-sm sm:text-base font-extrabold text-pink-700 mt-0.5 block">
-                    9:00 AM – 5:00 PM
+                    {settings.weekendHours || '9:00 AM – 5:00 PM'}
                   </span>
                 </div>
               </div>
@@ -282,7 +292,7 @@ export const About: React.FC<AboutProps> = ({ setCurrentTab }) => {
                   Easy Access & Comfortable Parlor
                 </h4>
                 <p className="text-stone-600 text-xs sm:text-sm leading-relaxed mt-1">
-                  Located right at Panchdhara, Swayambhu with accessible road access and parking. Our parlor features a clean, air-conditioned interior where you can unwind while receiving personalized beauty care.
+                  {settings.sanctuaryDescription || 'Located right at Panchdhara, Swayambhu with accessible road access and parking. Our parlor features a clean, air-conditioned interior where you can unwind while receiving personalized beauty care.'}
                 </p>
               </div>
 

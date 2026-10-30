@@ -201,7 +201,9 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentTab }) => {
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-pink-600 flex-shrink-0 mt-0.5" />
                 <span>
-                  {typeof settings.openingHours === 'string' 
+                  {settings.weekdayHours && settings.weekendHours
+                    ? `${settings.weekdayLabel || 'Sun–Fri'}: ${settings.weekdayHours} | ${settings.weekendLabel || 'Sat'}: ${settings.weekendHours}`
+                    : typeof settings.openingHours === 'string' 
                     ? settings.openingHours 
                     : Array.isArray(settings.openingHours)
                     ? settings.openingHours.map(o => `${o.day}: ${o.closed ? 'Closed' : `${o.open} - ${o.close}`}`).join(' | ')
@@ -237,14 +239,6 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentTab }) => {
             <span className="flex items-center gap-1">
               Made with <Heart className="w-3.5 h-3.5 text-pink-500 fill-current" /> in Kathmandu
             </span>
-            <span>•</span>
-            <button
-              onClick={() => handleNav('login')}
-              className="text-pink-700 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Admin Portal
-            </button>
           </div>
         </div>
       </div>

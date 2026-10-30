@@ -12,13 +12,15 @@ import {
   Check,
   UserCheck,
   LogIn,
-  RotateCcw
+  RotateCcw,
+  Scissors
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Booking as BookingType } from '../types';
 import { getBookedSlotsForDate, placeBookingFast } from '../lib/bookingStore';
+import { formatDuration, parseDurationMinutes } from '../lib/formatters';
 
 interface BookingProps {
   setCurrentTab: (tab: string) => void;
@@ -219,7 +221,7 @@ export const Booking: React.FC<BookingProps> = ({ setCurrentTab, preselectedServ
   }, [selectedServicesObjects]);
 
   const totalEstDuration = useMemo(() => {
-    return selectedServicesObjects.reduce((acc, curr) => acc + (Number(curr.duration) || 30), 0);
+    return selectedServicesObjects.reduce((acc, curr) => acc + parseDurationMinutes(curr.duration), 0);
   }, [selectedServicesObjects]);
 
   const toggleService = (title: string) => {
@@ -242,6 +244,44 @@ Please confirm my appointment slot!`;
 
     const cleanPhone = settings.whatsapp.replace(/[^0-9]/g, '');
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+  };
+
+  // Safe navigation between steps with validation & smooth scroll
+  const handleStepChange = (targetStep: 1 | 2 | 3) => {
+    setErrorMsg('');
+    if (targetStep === 1) {
+      setStep(1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (targetStep === 2) {
+      if (selectedServiceTitles.length === 0) {
+        setErrorMsg('Please select at least one treatment below to continue.');
+        return;
+      }
+      setStep(2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    if (targetStep === 3) {
+      if (selectedServiceTitles.length === 0) {
+        setErrorMsg('Please select at least one treatment first.');
+        setStep(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (!date || !time) {
+        setErrorMsg('Please choose your preferred appointment date and time slot.');
+        setStep(2);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      setStep(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
   };
 
   // Handle final appointment confirmation
@@ -421,31 +461,150 @@ Please confirm my appointment slot!`;
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-10 space-y-5 bg-white pb-28 sm:pb-16">
+    <div className="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 bg-white pb-36 sm:pb-28">
       
-      {/* Step Progress Bar (Thumb-Friendly Header) */}
-      <div className="bg-pink-50/70 border border-pink-200 rounded-2xl p-3 sm:p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#8A2E44] text-white text-xs font-bold flex items-center justify-center">
-              {step}
-            </span>
-            <h1 className="font-serif font-bold text-sm sm:text-base text-pink-950">
-              {step === 1 && t('booking.step1_title')}
-              {step === 2 && t('booking.step2_title')}
-              {step === 3 && t('booking.step3_title')}
+      {/* ============================================================== */}
+      {/* TOP INTERACTIVE BOOKING STEPS (Clear & Clickable Navigation)   */}
+      {/* ============================================================== */}
+      <div className="bg-gradient-to-b from-white to-pink-50/50 border-2 border-pink-200 rounded-3xl p-3 sm:p-5 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pink-100/80 pb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#8A2E44] animate-pulse" />
+              <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-[#8A2E44]">
+                Online Appointment • 3 Easy Steps
+              </span>
+            </div>
+            <h1 className="font-serif font-bold text-lg sm:text-2xl text-pink-950 mt-0.5">
+              {step === 1 && 'Step 1: Choose Your Beauty Treatments'}
+              {step === 2 && 'Step 2: Choose Appointment Day & Time'}
+              {step === 3 && 'Step 3: Review & Confirm Appointment'}
             </h1>
           </div>
-          <span className="text-[11px] font-bold text-[#8A2E44] uppercase tracking-wider">
-            Step {step} of 3
-          </span>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="text-xs font-extrabold text-[#8A2E44] bg-pink-100/80 px-3 py-1 rounded-full border border-pink-200">
+              Step {step} of 3
+            </span>
+          </div>
         </div>
 
-        {/* Visual Progress Line */}
-        <div className="w-full bg-pink-200 h-2 rounded-full overflow-hidden">
+        {/* 3 Interactive Step Cards / Buttons */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {/* Step 1 Tab Button */}
+          <button
+            type="button"
+            onClick={() => handleStepChange(1)}
+            className={`p-2.5 sm:p-3.5 rounded-2xl border-2 transition-all cursor-pointer text-left flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 active:scale-98 ${
+              step === 1
+                ? 'bg-white border-[#8A2E44] ring-2 ring-rose-200 shadow-md'
+                : selectedServiceTitles.length > 0
+                ? 'bg-pink-50/50 border-pink-200 hover:border-pink-300 hover:bg-pink-100/50'
+                : 'bg-stone-50 border-stone-200 opacity-70 hover:opacity-100'
+            }`}
+          >
+            <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0 transition-colors ${
+              step === 1
+                ? 'bg-[#8A2E44] text-white shadow-xs'
+                : selectedServiceTitles.length > 0
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-stone-200 text-stone-600'
+            }`}>
+              {selectedServiceTitles.length > 0 && step > 1 ? (
+                <Check className="w-4 h-4 stroke-[3]" />
+              ) : (
+                <Scissors className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">1. Treatments</span>
+              <p className={`text-xs sm:text-sm font-black truncate leading-tight ${step === 1 ? 'text-[#8A2E44]' : 'text-stone-800'}`}>
+                Services
+              </p>
+              <span className="hidden sm:block text-[11px] text-stone-500 truncate mt-0.5">
+                {selectedServiceTitles.length > 0 ? `${selectedServiceTitles.length} selected` : 'Pick services'}
+              </span>
+            </div>
+          </button>
+
+          {/* Step 2 Tab Button */}
+          <button
+            type="button"
+            onClick={() => handleStepChange(2)}
+            className={`p-2.5 sm:p-3.5 rounded-2xl border-2 transition-all cursor-pointer text-left flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 active:scale-98 ${
+              step === 2
+                ? 'bg-white border-[#8A2E44] ring-2 ring-rose-200 shadow-md'
+                : date && time
+                ? 'bg-pink-50/50 border-pink-200 hover:border-pink-300 hover:bg-pink-100/50'
+                : selectedServiceTitles.length > 0
+                ? 'bg-white border-pink-200 hover:border-pink-400'
+                : 'bg-stone-50 border-stone-200 opacity-50 cursor-not-allowed'
+            }`}
+          >
+            <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0 transition-colors ${
+              step === 2
+                ? 'bg-[#8A2E44] text-white shadow-xs'
+                : date && time && step > 2
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : selectedServiceTitles.length > 0
+                ? 'bg-pink-100 text-[#8A2E44]'
+                : 'bg-stone-200 text-stone-600'
+            }`}>
+              {date && time && step > 2 ? (
+                <Check className="w-4 h-4 stroke-[3]" />
+              ) : (
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">2. Schedule</span>
+              <p className={`text-xs sm:text-sm font-black truncate leading-tight ${step === 2 ? 'text-[#8A2E44]' : 'text-stone-800'}`}>
+                Date & Time
+              </p>
+              <span className="hidden sm:block text-[11px] text-stone-500 truncate mt-0.5">
+                {date && time ? `${time}` : 'Choose slot'}
+              </span>
+            </div>
+          </button>
+
+          {/* Step 3 Tab Button */}
+          <button
+            type="button"
+            onClick={() => handleStepChange(3)}
+            className={`p-2.5 sm:p-3.5 rounded-2xl border-2 transition-all cursor-pointer text-left flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 active:scale-98 ${
+              step === 3
+                ? 'bg-white border-[#8A2E44] ring-2 ring-rose-200 shadow-md'
+                : selectedServiceTitles.length > 0 && date && time
+                ? 'bg-pink-50/50 border-pink-200 hover:border-pink-300 hover:bg-pink-100/50'
+                : 'bg-stone-50 border-stone-200 opacity-50 cursor-not-allowed'
+            }`}
+          >
+            <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0 transition-colors ${
+              step === 3
+                ? 'bg-[#8A2E44] text-white shadow-xs'
+                : selectedServiceTitles.length > 0 && date && time
+                ? 'bg-pink-100 text-[#8A2E44]'
+                : 'bg-stone-200 text-stone-600'
+            }`}>
+              <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">3. Final</span>
+              <p className={`text-xs sm:text-sm font-black truncate leading-tight ${step === 3 ? 'text-[#8A2E44]' : 'text-stone-800'}`}>
+                Confirm
+              </p>
+              <span className="hidden sm:block text-[11px] text-stone-500 truncate mt-0.5">
+                Review & Book
+              </span>
+            </div>
+          </button>
+        </div>
+
+        {/* Progress Bar line with smooth gradient */}
+        <div className="w-full bg-pink-100 h-2 rounded-full overflow-hidden mt-2">
           <div
-            className="bg-gradient-to-r from-pink-500 to-[#8A2E44] h-full transition-all duration-300 rounded-full"
-            style={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%' }}
+            className="bg-gradient-to-r from-pink-500 via-rose-600 to-[#8A2E44] h-full transition-all duration-300 rounded-full"
+            style={{ width: step === 1 ? '33.3%' : step === 2 ? '66.6%' : '100%' }}
           />
         </div>
       </div>
@@ -524,7 +683,7 @@ Please confirm my appointment slot!`;
                         {srv.duration && (
                           <span className="text-[11px] text-stone-400 font-semibold flex items-center gap-1">
                             <Clock className="w-3 h-3 text-pink-500" />
-                            {srv.duration} min
+                            {formatDuration(srv.duration)}
                           </span>
                         )}
                       </div>
@@ -576,8 +735,30 @@ Please confirm my appointment slot!`;
             })}
           </div>
 
+          {/* Bottom Navigation for Step 1 (Inline + Sticky Bar) */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-pink-50/70 p-4 sm:p-5 rounded-3xl border-2 border-pink-200">
+            <div>
+              <span className="text-xs uppercase font-bold text-stone-500 block">
+                {selectedServiceTitles.length} {t('booking.selected_count')}
+              </span>
+              <span className="font-serif font-black text-xl sm:text-2xl text-[#8A2E44]">
+                Rs. {totalPrice.toLocaleString()}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              disabled={selectedServiceTitles.length === 0}
+              onClick={() => handleStepChange(2)}
+              className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-[#8A2E44] text-white px-7 sm:px-9 py-3.5 rounded-2xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
+            >
+              <span>Next: Choose Date & Time</span>
+              <ArrowRight className="w-4 h-4 text-pink-200" />
+            </button>
+          </div>
+
           {/* Sticky Bottom Action Bar for Step 1 */}
-          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-3 sm:px-6">
+          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t-2 border-pink-200 shadow-[0_-4px_20px_rgba(138,46,68,0.08)] p-3 sm:px-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] uppercase font-bold text-stone-500 block">
@@ -591,14 +772,10 @@ Please confirm my appointment slot!`;
               <button
                 type="button"
                 disabled={selectedServiceTitles.length === 0}
-                onClick={() => {
-                  setErrorMsg('');
-                  setStep(2);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={() => handleStepChange(2)}
                 className="bg-gradient-to-r from-pink-600 to-[#8A2E44] text-white px-5 sm:px-8 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
               >
-                <span>{t('action.choose_datetime')}</span>
+                <span>Next: Choose Date & Time</span>
                 <ArrowRight className="w-4 h-4 text-pink-200" />
               </button>
             </div>
@@ -718,29 +895,61 @@ Please confirm my appointment slot!`;
             </div>
           </div>
 
+          {/* Bottom Navigation for Step 2 (Inline + Sticky Bar) */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-pink-50/70 p-4 sm:p-5 rounded-3xl border-2 border-pink-200">
+            <button
+              type="button"
+              onClick={() => handleStepChange(1)}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer min-h-[48px] transition active:scale-95 shadow-xs"
+            >
+              <ArrowLeft className="w-4 h-4 text-stone-600" />
+              <span>← Previous: Services</span>
+            </button>
+
+            <div className="text-center">
+              <span className="text-[11px] uppercase font-bold text-stone-500 block">Chosen Slot</span>
+              <span className="text-sm font-black text-[#8A2E44]">
+                {date ? date : 'No date'} • {time ? time : 'Pick time slot'}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              disabled={!date || !time}
+              onClick={() => handleStepChange(3)}
+              className="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-[#8A2E44] text-white px-7 sm:px-9 py-3.5 rounded-2xl font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
+            >
+              <span>Next: Review & Confirm →</span>
+              <ArrowRight className="w-4 h-4 text-pink-200" />
+            </button>
+          </div>
+
           {/* Sticky Bottom Bar for Step 2 */}
-          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-3 sm:px-6">
+          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t-2 border-pink-200 shadow-[0_-4px_20px_rgba(138,46,68,0.08)] p-3 sm:px-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
               <button
                 type="button"
-                onClick={() => setStep(1)}
-                className="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 hover:bg-stone-50 cursor-pointer min-h-[48px]"
+                onClick={() => handleStepChange(1)}
+                className="px-4 sm:px-5 py-2.5 rounded-2xl border-2 border-stone-200 bg-white text-stone-800 font-bold text-xs sm:text-sm flex items-center gap-1.5 hover:bg-stone-50 cursor-pointer min-h-[48px] shadow-xs active:scale-95"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>{t('action.back')}</span>
+                <ArrowLeft className="w-4 h-4 text-stone-600" />
+                <span>← Previous</span>
               </button>
+
+              <div className="hidden sm:block text-center">
+                <span className="text-[10px] uppercase font-bold text-stone-400 block">Selected Slot</span>
+                <span className="text-xs font-bold text-[#8A2E44]">
+                  {date} • {time || 'Choose a slot'}
+                </span>
+              </div>
 
               <button
                 type="button"
                 disabled={!date || !time}
-                onClick={() => {
-                  setErrorMsg('');
-                  setStep(3);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="bg-gradient-to-r from-pink-600 to-[#8A2E44] text-white px-6 sm:px-8 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
+                onClick={() => handleStepChange(3)}
+                className="bg-gradient-to-r from-pink-600 to-[#8A2E44] text-white px-5 sm:px-8 py-3 rounded-2xl font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
               >
-                <span>{t('action.continue_summary')}</span>
+                <span>Next: Review & Confirm</span>
                 <ArrowRight className="w-4 h-4 text-pink-200" />
               </button>
             </div>
@@ -783,7 +992,7 @@ Please confirm my appointment slot!`;
                   <div key={s.id || s.title} className="py-2 flex items-center justify-between text-xs sm:text-sm">
                     <div>
                       <p className="font-bold text-stone-900">{s.name || s.title}</p>
-                      <p className="text-[11px] text-stone-500">{s.category} • {s.duration || 30} min</p>
+                      <p className="text-[11px] text-stone-500">{s.category} • {formatDuration(s.duration)}</p>
                     </div>
                     <span className="font-serif font-bold text-[#8A2E44]">
                       Rs. {Number(s.price).toLocaleString()}
@@ -896,16 +1105,37 @@ Please confirm my appointment slot!`;
             )}
           </div>
 
+          {/* Bottom Navigation for Step 3 (Inline + Sticky Bar) */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-pink-50/70 p-4 sm:p-5 rounded-3xl border-2 border-pink-200">
+            <button
+              type="button"
+              onClick={() => handleStepChange(2)}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl border-2 border-stone-300 bg-white hover:bg-stone-50 text-stone-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer min-h-[48px] transition active:scale-95 shadow-xs"
+            >
+              <ArrowLeft className="w-4 h-4 text-stone-600" />
+              <span>← Previous: Date & Time</span>
+            </button>
+
+            <button
+              type="submit"
+              disabled={isSubmitting || !currentUser}
+              className="w-full sm:w-auto bg-gradient-to-r from-pink-600 via-rose-600 to-[#8A2E44] text-white px-8 sm:px-10 py-3.5 rounded-2xl font-bold text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4 text-white" />
+              <span>{isSubmitting ? 'Reserving...' : 'Confirm & Book Appointment ✓'}</span>
+            </button>
+          </div>
+
           {/* Sticky Bottom Bar for Step 3 */}
-          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-pink-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] p-3 sm:px-6">
+          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t-2 border-pink-200 shadow-[0_-4px_20px_rgba(138,46,68,0.08)] p-3 sm:px-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
               <button
                 type="button"
-                onClick={() => setStep(2)}
-                className="px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 font-bold text-xs flex items-center gap-1.5 hover:bg-stone-50 cursor-pointer min-h-[48px]"
+                onClick={() => handleStepChange(2)}
+                className="px-4 sm:px-5 py-2.5 rounded-2xl border-2 border-stone-200 bg-white text-stone-800 font-bold text-xs sm:text-sm flex items-center gap-1.5 hover:bg-stone-50 cursor-pointer min-h-[48px] shadow-xs active:scale-95"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>{t('action.back')}</span>
+                <ArrowLeft className="w-4 h-4 text-stone-600" />
+                <span>← Previous</span>
               </button>
 
               <button
@@ -914,7 +1144,7 @@ Please confirm my appointment slot!`;
                 className="bg-gradient-to-r from-pink-600 via-rose-600 to-[#8A2E44] text-white px-6 sm:px-10 py-3.5 rounded-2xl font-bold text-xs sm:text-sm shadow-lg transition flex items-center gap-2 active:scale-95 disabled:opacity-40 disabled:pointer-events-none min-h-[48px] cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4 text-white" />
-                <span>{isSubmitting ? 'Reserving...' : t('action.confirm_booking')}</span>
+                <span>{isSubmitting ? 'Reserving...' : 'Confirm Appointment ✓'}</span>
               </button>
             </div>
           </div>

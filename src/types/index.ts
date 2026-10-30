@@ -163,5 +163,26 @@ export interface SiteSettings {
   heroSubtitle?: string;
   heroCtaText?: string;
   updatedAt?: string;
+
+  // Salon Experience & Stats
+  experienceYears?: string;
+  experienceLabel?: string;
+  cosmeticsQuality?: string;
+  cosmeticsLabel?: string;
+
+  // Opening Hours & Walk-In Policy
+  walkInPolicy?: string;
+  weekdayLabel?: string;
+  weekdayHours?: string;
+  weekendLabel?: string;
+  weekendHours?: string;
+
+  // Founder & Story
+  founderName?: string;
+  founderRole?: string;
+  founderQuote?: string;
+  aboutStoryText?: string;
+  aboutMissionText?: string;
+  sanctuaryDescription?: string;
 }
 
