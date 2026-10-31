@@ -232,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
 
       {/* 3. FULL MOBILE MENU MODAL (Triggered when 3 dots is clicked, rendered via createPortal directly to body) */}
       {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4 pt-[calc(env(safe-area-inset-top,24px)+8px)]">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/75 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
@@ -245,14 +245,21 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
             role="dialog"
             aria-modal="true"
             aria-label="Kamala Beauty Parlor Navigation Menu"
-            className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-2 border-pink-300 max-h-[92vh] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-5"
+            className="relative z-10 w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border-2 border-pink-300 max-h-[calc(100dvh-env(safe-area-inset-top,24px)-16px)] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-200"
           >
             
-            {/* Grab Handle for Touch UI */}
-            <div className="w-12 h-1.5 bg-stone-300 rounded-full mx-auto my-2 sm:hidden flex-shrink-0" />
+            {/* Grab Handle for Touch UI (also clickable to close) */}
+            <button 
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 w-full sm:hidden flex-shrink-0 flex justify-center cursor-pointer active:opacity-60 bg-white"
+              aria-label="Dismiss menu"
+            >
+              <div className="w-12 h-1.5 bg-stone-300 rounded-full" />
+            </button>
 
             {/* Header with Salon Brand & Close button */}
-            <div className="px-4 py-3 bg-gradient-to-r from-[#8A2E44] via-rose-700 to-[#8A2E44] text-white flex items-center justify-between shadow-md flex-shrink-0">
+            <div className="sticky top-0 z-20 px-4 py-3 bg-gradient-to-r from-[#8A2E44] via-rose-700 to-[#8A2E44] text-white flex items-center justify-between shadow-md flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md bg-white flex-shrink-0">
                   <img
@@ -272,16 +279,17 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
               </div>
 
               <button
+                type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white bg-white/20 hover:bg-white/30 cursor-pointer active:scale-95 transition"
+                className="w-11 h-11 rounded-full flex items-center justify-center text-white bg-white/20 hover:bg-white/30 active:bg-white/40 cursor-pointer active:scale-95 transition shadow-sm"
                 aria-label="Close menu"
               >
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6 stroke-[2.5]" />
               </button>
             </div>
 
             {/* Scrollable Options List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 pb-[calc(1.5rem+env(safe-area-inset-bottom,16px))] sm:pb-6 overscroll-contain">
               
               {/* ADMIN BANNER & DIRECT ACCESS (If logged in as Admin) */}
               {isAdmin && (
@@ -422,6 +430,18 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, setCurrentTab }) => 
                 <p className="text-[11px] text-stone-500 font-medium">
                   Website made by <span className="text-[#8A2E44] font-bold">Er. Sagar Chokhal</span>
                 </p>
+              </div>
+
+              {/* CONVENIENT THUMB CLOSE BUTTON */}
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3 bg-pink-100/70 hover:bg-pink-100 active:bg-pink-200 text-[#8A2E44] font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition cursor-pointer min-h-[44px] border border-pink-200"
+                >
+                  <X className="w-4 h-4 text-[#8A2E44]" />
+                  <span>Close Menu</span>
+                </button>
               </div>
 
             </div>
