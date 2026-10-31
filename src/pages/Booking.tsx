@@ -758,7 +758,7 @@ Please confirm my appointment slot!`;
           </div>
 
           {/* Sticky Bottom Action Bar for Step 1 */}
-          <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t-2 border-pink-200 shadow-[0_-4px_25px_rgba(138,46,68,0.12)] p-3 sm:px-6">
+          <div className="sticky-booking-bar bg-white/95 backdrop-blur-md border-t-2 border-b border-pink-200 md:border-b-0 shadow-[0_-4px_25px_rgba(138,46,68,0.12)] p-3 sm:px-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] uppercase font-bold text-stone-500 block">
@@ -925,7 +925,7 @@ Please confirm my appointment slot!`;
           </div>
 
           {/* Sticky Bottom Bar for Step 2 */}
-          <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t-2 border-pink-200 shadow-[0_-4px_25px_rgba(138,46,68,0.12)] p-3 sm:px-6">
+          <div className="sticky-booking-bar bg-white/95 backdrop-blur-md border-t-2 border-b border-pink-200 md:border-b-0 shadow-[0_-4px_25px_rgba(138,46,68,0.12)] p-3 sm:px-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
               <button
                 type="button"
@@ -1127,7 +1127,7 @@ Please confirm my appointment slot!`;
           </div>
 
           {/* Sticky Bottom Bar for Step 3 */}
-          <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t-2 border-pink-200 shadow-[0_-4px_25px_rgba(138,46,68,0.12)] p-3 sm:px-6">
+          <div className="sticky-booking-bar bg-white/95 backdrop-blur-md border-t-2 border-b border-pink-200 md:border-b-0 shadow-[0_-4px_25px_rgba(138,46,68,0.12)] p-3 sm:px-6">
             <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
               <button
                 type="button"

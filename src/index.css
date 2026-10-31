@@ -32,3 +32,18 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #EC4899;
 }
+
+/* Sticky booking action bar pinned cleanly above mobile bottom nav and its protruding center booking button */
+.sticky-booking-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+}
+
+@media (min-width: 768px) {
+  .sticky-booking-bar {
+    bottom: 0;
+  }
+}
